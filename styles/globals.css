@@ -1,3 +1,32 @@
+/* styles/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
+
+/* Estilos globais adicionais */
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif; /* Substitua pela fonte que preferir */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Outros ajustes globais */
+
+/* styles/globals.css ou qualquer outro arquivo CSS global */
+.slick-prev,
+.slick-next {
+  z-index: 1; /* Garante que as setas estejam acima de outros elementos */
+}
+
+.slick-prev {
+  left: 10px; /* Ajuste conforme necessário */
+}
+
+.slick-next {
+  right: 10px; /* Ajuste conforme necessário */
+}
