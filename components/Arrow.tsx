@@ -14,7 +14,7 @@ export const ArrowPrev: React.FC<ArrowProps> = ({
 }) => (
   <div
     className={`absolute top-1/2 left-3 transform -translate-y-1/2 cursor-pointer ${className}`}
-    style={style}
+    style={{ fontSize: "2rem", ...style }} // Aumenta o tamanho da fonte
     onClick={onClick}
   >
     &#10094; {/* Ou qualquer ícone que você queira usar */}
@@ -28,7 +28,7 @@ export const ArrowNext: React.FC<ArrowProps> = ({
 }) => (
   <div
     className={`absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer ${className}`}
-    style={style}
+    style={{ fontSize: "2rem", ...style }} // Aumenta o tamanho da fonte
     onClick={onClick}
   >
     &#10095; {/* Ou qualquer ícone que você queira usar */}

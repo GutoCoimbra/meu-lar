@@ -24,9 +24,23 @@ a {
 }
 
 .slick-prev {
-  left: 10px; /* Ajuste conforme necessário */
+  left: 20px; /* Ajuste conforme necessário */
 }
 
 .slick-next {
-  right: 10px; /* Ajuste conforme necessário */
+  right: 20px; /* Ajuste conforme necessário */
+}
+
+/* styles/globals.css */
+.custom-dot {
+  width: 13px;
+  height: 13px;
+  background-color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-dot.slick-active {
+  background-color: #0070f3; /* Ajuste para a cor desejada */
 }

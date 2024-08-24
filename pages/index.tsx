@@ -1,6 +1,7 @@
 // pages/index.tsx
 import { useState } from "react";
 import type { NextPage, GetStaticProps } from "next";
+import Header from "../components/Header"; // Importar o componente Header
 import Card from "../components/Card";
 import Filter from "../components/Filter"; // Importar o componente de filtro
 
@@ -58,14 +59,15 @@ const Home: NextPage<HomeProps> = ({ units }) => {
   };
 
   return (
-    <div className="p-4 bg-gray-100">
+    <div className="p-0 bg-gray-100">
+      <Header />
       <Filter onFilter={handleFilter} units={units} />
-      {/* Grid responsiva ajustada */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredUnits.map((unit) => (
           <Card
-            key={unit.idUnit} // Use idUnit como chave
-            idUnit={unit.idUnit} // Passe idUnit para o Card
+            key={unit.idUnit}
+            idUnit={unit.idUnit}
             address={unit.address}
             unitNumber={unit.unit}
             type={unit.type}
