@@ -83,7 +83,7 @@ const Header: React.FC = () => {
           href="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
-          <img src="../images/property.png" className="h-8" alt="MeuLar" />
+          <img src="/images/property.png" className="h-8" alt="MeuLar" />
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             MeuLar
           </span>
