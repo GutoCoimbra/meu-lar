@@ -1,3 +1,5 @@
+// api/units/index.ts
+
 import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
 import path from "path";
@@ -10,7 +12,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       const fileContents = fs.readFileSync(filePath, "utf-8");
       const units = JSON.parse(fileContents);
 
-      // Retornar as unidades
+      // Retornar todas as unidades
       res.status(200).json(units);
     } catch (error) {
       console.error("Failed to read units:", error);

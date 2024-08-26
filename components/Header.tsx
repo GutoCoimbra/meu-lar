@@ -54,7 +54,7 @@ const Header: React.FC = () => {
             </li>
             <li>
               <Link
-                href="/services"
+                href="../components/UnitForm.tsx"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Unidades
@@ -74,6 +74,12 @@ const Header: React.FC = () => {
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Contato
+              </Link>
+              <Link
+                href="/admin"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Admin
               </Link>
             </li>
           </ul>

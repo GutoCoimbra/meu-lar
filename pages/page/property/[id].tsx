@@ -7,12 +7,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowPrev, ArrowNext } from "../../../components/Arrow";
 import Header from "@/components/Header";
+import PropertyCosts from "@/components/PropertyCosts";
+import AvailableItems from "@/components/AvailableItems";
 
 type Unit = {
   idUnit: number;
   address: string;
-  number: string;
-  unit: string;
+  addressNumber: string;
+  unitNumber: string;
   type: string;
   squareMeter: string;
   rooms: string;
@@ -76,6 +78,7 @@ const PropertyPage = ({ unit }: Props) => {
     idUnit,
     imgUrl,
     address,
+    unitNumber,
     neighborhood,
     city,
     state,
@@ -140,13 +143,6 @@ const PropertyPage = ({ unit }: Props) => {
   const internetTaxNum =
     parseFloat(internetTax.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
 
-  const totalCost =
-    rentValueNum +
-    condominiumNum +
-    waterTaxNum +
-    electricityTaxNum +
-    internetTaxNum;
-
   const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${zipcode}`;
 
   return (
@@ -157,10 +153,8 @@ const PropertyPage = ({ unit }: Props) => {
         <div className="relative h-64 w-full">
           <Slider {...settings}>
             {imagesAndVideos.map((src, index) => {
-              // Verifica se src não é nulo ou indefinido
               if (!src) return null;
 
-              // Verifica a extensão do arquivo
               const fileExtension = src.split(".").pop()?.toLowerCase() || "";
 
               return fileExtension === "mp4" ? (
@@ -190,6 +184,8 @@ const PropertyPage = ({ unit }: Props) => {
           <span className="text-1xl font-bold">
             {address} - {neighborhood} - {city} - {state}
           </span>
+          <br />
+          <span className="text-1xl">Unidade {unitNumber}</span>
 
           {/* Link para o Google Maps */}
           <div className="mb-4">
@@ -204,71 +200,19 @@ const PropertyPage = ({ unit }: Props) => {
           </div>
 
           {/* Custos do Imóvel */}
-          <div className="mb-4">
-            <h2 className="text-sm font-bold mb-2">Custos do Imóvel</h2>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <p className="text-gray-700 text-xs">Aluguel:</p>
-                <p className="text-gray-700 text-xs text-right">
-                  {formatCurrency(rentValueNum)}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-gray-700 text-xs">Condomínio:</p>
-                <p className="text-gray-700 text-xs text-right">
-                  {formatCurrency(condominiumNum) ||
-                    "Consumo por conta do locatário"}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-gray-700 text-xs">Taxa de Água:</p>
-                <p className="text-gray-700 text-xs text-right">
-                  {formatCurrency(waterTaxNum) ||
-                    "Consumo por conta do locatário"}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-gray-700 text-xs">Taxa de Eletricidade:</p>
-                <p className="text-gray-700 text-xs text-right">
-                  {formatCurrency(electricityTaxNum) ||
-                    "Consumo por conta do locatário"}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-gray-700 text-xs">Taxa de Internet:</p>
-                <p className="text-gray-700 text-xs text-right">
-                  {formatCurrency(internetTaxNum) ||
-                    "Consumo por conta do locatário"}
-                </p>
-              </div>
-            </div>
-            <div className="border-t border-gray-300 mt-2 pt-2">
-              <div className="flex justify-between">
-                <p className="text-sm font-bold">Total:</p>
-                <p className="text-sm font-bold text-right">
-                  {formatCurrency(totalCost)}
-                </p>
-              </div>
-            </div>
-          </div>
+          <PropertyCosts
+            rentValueNum={rentValueNum}
+            condominiumNum={condominiumNum}
+            waterTaxNum={waterTaxNum}
+            electricityTaxNum={electricityTaxNum}
+            internetTaxNum={internetTaxNum}
+            formatCurrency={formatCurrency}
+          />
 
           <p className="text-gray-600 mb-4">{description}</p>
 
           {/* Itens Disponíveis */}
-          <div className="mt-8">
-            <h2 className="text-sm font-bold mb-4">Itens Disponíveis</h2>
-            <ul className="text-xs list-disc list-inside pl-5">
-              {availableItems.length > 0 ? (
-                availableItems.map((item, index) => (
-                  <li key={index} className="text-gray-700">
-                    {item}
-                  </li>
-                ))
-              ) : (
-                <li className="text-gray-700">Nenhum item disponível.</li>
-              )}
-            </ul>
-          </div>
+          <AvailableItems availableItems={availableItems} />
         </div>
       </div>
 

@@ -20,7 +20,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "pages/api/auth/[...nextauth]"
+    "pages/api/auth/[...nextauth]",
+    "types" // Adicione a pasta onde está o arquivo de declaração
   ],
   "exclude": ["node_modules"]
 }

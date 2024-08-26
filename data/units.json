@@ -2,23 +2,27 @@
   {
     "idUnit": "1",
     "address": "Rua Antônio Francisco Rangel",
-    "number": "51",
-    "unit": "101",
-    "type": "Apartamento",
-    "squareMeter": "10",
+    "addressNumber": "51",
+    "unitNumber": "203",
+    "type": "Kitnet",
+    "squareMeter": "18",
     "rooms": "1",
-    "garage": "0",
+    "garage": "1",
     "neighborhood": "Itaúna",
     "city": "São Gonçalo",
     "state": "RJ",
     "zipcode": "24473-075",
     "available": "sim",
-    "rentValue": "1200",
-    "condominium": "300",
-    "waterTax": "50",
-    "electricityTax": "",
-    "internetTax": "1000",
-    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
+    "rentValue": "2000",
+    "condominium": "1",
+    "waterTax": "501",
+    "electricityTax": "1",
+    "internetTax": "12",
+    "imgUrl": [
+      "image1.jpeg",
+      "image2.jpeg",
+      "video.mp4"
+    ],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -42,13 +46,15 @@
       "Somente uma casa no terreno",
       "Garden/Área Privativa"
     ],
-    "renters": []
+    "renters": [],
+    "unit": "10",
+    "number": "5"
   },
   {
     "idUnit": "2",
     "address": "Rua Antônio Francisco Rangel",
-    "number": "51",
-    "unit": "102",
+    "addressNumber": "51",
+    "unitNumber": "102",
     "type": "Apartamento",
     "squareMeter": "10",
     "rooms": "1",
@@ -57,13 +63,17 @@
     "city": "São Gonçalo",
     "state": "RJ",
     "zipcode": "24473-075",
-    "available": "sim",
+    "available": "não",
     "rentValue": "1.200",
     "condominium": "300",
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
+    "imgUrl": [
+      "image1.jpeg",
+      "image2.jpeg",
+      "video.mp4"
+    ],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -92,8 +102,8 @@
   {
     "idUnit": "3",
     "address": "Rua Antônio Francisco Rangel",
-    "number": "51",
-    "unit": "101",
+    "addressNumber": "51",
+    "unitNumber": "103",
     "type": "Apartamento",
     "squareMeter": "10",
     "rooms": "1",
@@ -108,7 +118,11 @@
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
+    "imgUrl": [
+      "image1.jpeg",
+      "image2.jpeg",
+      "video.mp4"
+    ],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -137,8 +151,8 @@
   {
     "idUnit": "4",
     "address": "Rua Narcisa Maria de Lima",
-    "number": "51",
-    "unit": "101",
+    "addressNumber": "51",
+    "unitNumber": "104",
     "type": "Apartamento",
     "squareMeter": "10",
     "rooms": "1",
@@ -153,7 +167,11 @@
     "waterTax": "50",
     "electricityTax": "50",
     "internetTax": "100",
-    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
+    "imgUrl": [
+      "image1.jpeg",
+      "image2.jpeg",
+      "video.mp4"
+    ],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -182,8 +200,8 @@
   {
     "idUnit": "5",
     "address": "Rua Coronel Tamarindo",
-    "number": "51",
-    "unit": "102",
+    "addressNumber": "51",
+    "unitNumber": "105",
     "type": "Apartamento",
     "squareMeter": "10",
     "rooms": "1",
@@ -198,7 +216,11 @@
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
+    "imgUrl": [
+      "image1.jpeg",
+      "image2.jpeg",
+      "video.mp4"
+    ],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -227,8 +249,8 @@
   {
     "idUnit": "6",
     "address": "Rua Marquês de Herval",
-    "number": "51",
-    "unit": "101",
+    "addressNumber": "51",
+    "unitNumber": "201",
     "type": "Apartamento",
     "squareMeter": "10",
     "rooms": "1",
@@ -243,7 +265,11 @@
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
+    "imgUrl": [
+      "image1.jpeg",
+      "image2.jpeg",
+      "video.mp4"
+    ],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
