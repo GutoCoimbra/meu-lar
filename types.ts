@@ -32,5 +32,3 @@ export interface Renter {
   rentalStartDate: string;
   rentalEndDate: string;
 }
-
-export default Unit;
