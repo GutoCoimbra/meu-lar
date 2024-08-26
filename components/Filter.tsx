@@ -1,5 +1,6 @@
 // components/Filter.tsx
 import { useState, useEffect } from "react";
+import { Unit } from "../types"; // Importando a interface Unit do arquivo types.ts
 
 interface FilterProps {
   onFilter: (filters: {
@@ -10,24 +11,6 @@ interface FilterProps {
     state: string;
   }) => void;
   units: Unit[];
-}
-
-interface Unit {
-  address: string;
-  number: string;
-  unit: string;
-  neighborhood: string;
-  city: string;
-  state: string;
-  zipcode: string;
-  available: string;
-  rentValue: string;
-  condominium: string;
-  waterTax: string;
-  electricityTax: string;
-  internetTax: string;
-  imgUrl: string;
-  renters: number[];
 }
 
 const Filter: React.FC<FilterProps> = ({ onFilter, units }) => {

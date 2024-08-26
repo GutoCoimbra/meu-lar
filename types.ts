@@ -1,7 +1,7 @@
 // types.ts
 
 export interface Unit {
-  idUnit: string;
+  idUnit: number; // Altere para number, se necessário
   address: string;
   addressNumber: string;
   unitNumber: string;
@@ -21,7 +21,16 @@ export interface Unit {
   internetTax: string;
   imgUrl: string[];
   availableItems: string[];
-  renters: string[];
+  renters: number[];
+}
+
+export interface Renter {
+  idRenter: number;
+  name: string;
+  email: string;
+  phone: string;
+  rentalStartDate: string;
+  rentalEndDate: string;
 }
 
 export default Unit;

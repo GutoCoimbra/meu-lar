@@ -1,31 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { NextPage, GetStaticProps } from "next";
 import Header from "../components/Header";
 import Card from "../components/Card";
 import Filter from "../components/Filter";
-
-interface Unit {
-  idUnit: number;
-  address: string;
-  number: string;
-  unitNumber: string;
-  type: string;
-  squareMeter: string;
-  rooms: string;
-  garage: string;
-  neighborhood: string;
-  city: string;
-  state: string;
-  zipcode: string;
-  available: string;
-  rentValue: string;
-  condominium: string;
-  waterTax: string;
-  electricityTax: string;
-  internetTax: string;
-  imgUrl: string[];
-  renters: number[];
-}
+import { Unit } from "../types"; // Importando a interface Unit definida no arquivo types.ts
 
 interface HomeProps {
   units: Unit[];
@@ -33,10 +11,6 @@ interface HomeProps {
 
 const Home: NextPage<HomeProps> = ({ units }) => {
   const [filteredUnits, setFilteredUnits] = useState<Unit[]>(units);
-
-  // useEffect(() => {
-  //   console.log("Initial units loaded:", units); // Log inicial para verificar unidades carregadas
-  // }, [units]);
 
   const handleFilter = (filters: {
     maxRentValue: number;
