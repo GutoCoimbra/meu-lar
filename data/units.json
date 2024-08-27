@@ -43,8 +43,7 @@
       "Cozinha americana",
       "Jardim",
       "Quintal",
-      "Somente uma casa no terreno",
-      "Garden/Área Privativa"
+      "Somente uma casa no terreno"
     ],
     "renters": [],
     "unit": "10",
@@ -292,6 +291,65 @@
       "Quintal",
       "Somente uma casa no terreno",
       "Garden/Área Privativa"
+    ],
+    "renters": []
+  },
+  {
+    "idUnit": "0",
+    "address": "Rua Deputado José Luís Ertal",
+    "addressNumber": "31",
+    "unitNumber": "1000",
+    "type": "Casa",
+    "squareMeter": "150",
+    "rooms": "5",
+    "garage": "1",
+    "neighborhood": "Piratininga",
+    "city": "Niterói",
+    "state": "RJ",
+    "zipcode": "24350-050",
+    "available": "sim",
+    "rentValue": "3000",
+    "condominium": "0,00",
+    "waterTax": "0,00",
+    "electricityTax": "0,00",
+    "internetTax": "0,00",
+    "imgUrl": [],
+    "availableItems": [
+      "Armários no quarto",
+      "Ar condicionado",
+      "Home-office"
+    ],
+    "renters": []
+  },
+  {
+    "idUnit": "0",
+    "address": "Travessa Iris Santiago",
+    "addressNumber": "98",
+    "unitNumber": "709",
+    "type": "Casa",
+    "squareMeter": "67",
+    "rooms": "4",
+    "garage": "4",
+    "neighborhood": "Laranjal",
+    "city": "São Gonçalo",
+    "state": "RJ",
+    "zipcode": "24474-140",
+    "available": "sim",
+    "rentValue": "2333",
+    "condominium": "0",
+    "waterTax": "0",
+    "electricityTax": "0",
+    "internetTax": "0",
+    "imgUrl": [],
+    "availableItems": [
+      "Armários no quarto",
+      "Armários nos banheiros",
+      "Armários na cozinha",
+      "Ar condicionado",
+      "Chuveiro a gás",
+      "Fogão incluso",
+      "Geladeira inclusa",
+      "Home-office"
     ],
     "renters": []
   }

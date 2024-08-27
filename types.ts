@@ -1,7 +1,7 @@
 // types.ts
 
 export interface Unit {
-  idUnit: number; // Altere para number, se necessário
+  idUnit: string; // Altere para number, se necessário
   address: string;
   addressNumber: string;
   unitNumber: string;

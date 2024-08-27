@@ -1,4 +1,5 @@
-import React, { ChangeEvent } from "react";
+// components/AdminForm.tsx
+import React, { ChangeEvent, useEffect } from "react";
 import { Unit } from "../types"; // Ajuste o caminho conforme necessário
 
 interface AdminFormProps {
@@ -7,7 +8,20 @@ interface AdminFormProps {
 }
 
 const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
-  const [formData, setFormData] = React.useState<Unit>(unit);
+  const [formData, setFormData] = React.useState<Unit>({
+    ...unit,
+    imgUrl: unit.imgUrl || [], // Inicializa como array vazio se estiver undefined
+    renters: unit.renters || [], // Inicializa como array vazio se estiver undefined
+  });
+
+  useEffect(() => {
+    // Atualiza o estado quando a prop `unit` mudar
+    setFormData({
+      ...unit,
+      imgUrl: unit.imgUrl || [],
+      renters: unit.renters || [],
+    });
+  }, [unit]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -22,6 +36,15 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
+  };
+
+  const handleCheckboxChange = (item: string) => {
+    setFormData((prevState) => {
+      const items = prevState.availableItems.includes(item)
+        ? prevState.availableItems.filter((i) => i !== item)
+        : [...prevState.availableItems, item];
+      return { ...prevState, availableItems: items };
+    });
   };
 
   return (
@@ -42,7 +65,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
 
       <div>
         <label htmlFor="addressNumber" className="block font-medium">
-          Número
+          Número do Endereço
         </label>
         <input
           type="text"
@@ -56,7 +79,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
 
       <div>
         <label htmlFor="unitNumber" className="block font-medium">
-          Unidade
+          Número da Unidade
         </label>
         <input
           type="text"
@@ -70,16 +93,21 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
 
       <div>
         <label htmlFor="type" className="block font-medium">
-          Tipo
+          Tipo de Imóvel
         </label>
-        <input
-          type="text"
+        <select
           id="type"
           name="type"
           value={formData.type}
           onChange={handleChange}
           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-        />
+        >
+          <option value="">Selecione o tipo</option>
+          <option value="Casa">Casa</option>
+          <option value="Apartamento">Apartamento</option>
+          <option value="Kitnet">Kitnet</option>
+          <option value="Studio">Studio</option>
+        </select>
       </div>
 
       <div>
@@ -273,7 +301,9 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         <textarea
           id="imgUrl"
           name="imgUrl"
-          value={formData.imgUrl.join(", ")} // Convert array to comma-separated string
+          value={
+            Array.isArray(formData.imgUrl) ? formData.imgUrl.join(", ") : ""
+          } // Verificação de segurança
           onChange={(e) => {
             const imgUrls = e.target.value.split(",").map((url) => url.trim());
             setFormData({ ...formData, imgUrl: imgUrls });
@@ -289,7 +319,9 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         <textarea
           id="renters"
           name="renters"
-          value={formData.renters.join(", ")} // Convert array to comma-separated string
+          value={
+            Array.isArray(formData.renters) ? formData.renters.join(", ") : ""
+          } // Verificação de segurança
           onChange={(e) => {
             const renters = e.target.value
               .split(",")
@@ -298,6 +330,44 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
           }}
           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
         />
+      </div>
+
+      {/* Checkboxes para availableItems */}
+      <div className="space-y-2">
+        <h4 className="font-semibold">Itens Disponíveis</h4>
+        {[
+          "Armários no quarto",
+          "Armários nos banheiros",
+          "Armários na cozinha",
+          "Ar condicionado",
+          "Chuveiro a gás",
+          "Fogão incluso",
+          "Geladeira inclusa",
+          "Home-office",
+          "Quartos e corredores com portas amplas",
+          "Área de serviço",
+          "Banheira de hidromassagem",
+          "Varanda",
+          "Piscina privativa",
+          "Apartamento cobertura",
+          "Banheiro adaptado",
+          "Closet",
+          "Cozinha americana",
+          "Jardim",
+          "Quintal",
+          "Somente uma casa no terreno",
+          "Garden/Área Privativa",
+        ].map((item) => (
+          <label key={item} className="block">
+            <input
+              type="checkbox"
+              checked={formData.availableItems.includes(item)}
+              onChange={() => handleCheckboxChange(item)}
+              className="mr-2"
+            />
+            {item}
+          </label>
+        ))}
       </div>
 
       <button
