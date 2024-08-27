@@ -26,9 +26,19 @@ export interface Unit {
 
 export interface Renter {
   idRenter: number;
-  name: string;
-  email: string;
-  phone: string;
-  rentalStartDate: string;
-  rentalEndDate: string;
+  nameRenter: string;
+  emailRenter: string;
+  phoneRenter: string;
+  addressRenter: string;
+  cpfRenter: number;
+  idtRenter: number;
+  idtSenderRenter: string;
+  maritalStatusRenter: string;
+  birthdateRenter: string;
+  ciaWorksRenter: string;
+  admissionDataRenter: string;
+  salaryRenter: number;
+  idUnitIntended: number;
 }
+// rentalStartDateRenter: string;
+//   rentalEndDateRenter: string;

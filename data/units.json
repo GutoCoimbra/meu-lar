@@ -2,7 +2,7 @@
   {
     "idUnit": "1",
     "address": "Rua Antônio Francisco Rangel",
-    "addressNumber": "51",
+    "addressNumber": "512",
     "unitNumber": "203",
     "type": "Kitnet",
     "squareMeter": "18",
@@ -12,7 +12,7 @@
     "city": "São Gonçalo",
     "state": "RJ",
     "zipcode": "24473-075",
-    "available": "sim",
+    "available": "não",
     "rentValue": "2000",
     "condominium": "1",
     "waterTax": "501",

@@ -1,0 +1,18 @@
+[
+  {
+    "idRenter": 1,
+    "nameRenter": "GUTEMBERG DE OLIVEIRA COIMBRA",
+    "emailRenter": "gutembergcoimbra@hotmail.com",
+    "phoneRenter": "21971989573",
+    "addressRenter": "RUA CEL TAMARINDO, 8",
+    "cpfRenter": 23232,
+    "idtRenter": 3232,
+    "idtSenderRenter": "detran",
+    "maritalStatusRenter": "solteiro",
+    "birthdateRenter": "2024-08-20",
+    "ciaWorksRenter": "BAZAR IRMAOS GARCIA LTDA.",
+    "admissionDataRenter": "2024-08-26",
+    "salaryRenter": 3032,
+    "idUnitIntended": 1
+  }
+]
