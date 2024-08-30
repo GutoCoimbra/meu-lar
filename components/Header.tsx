@@ -1,8 +1,10 @@
 // components/Header.tsx
 import { useState } from "react";
 import Link from "next/link";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 const Header: React.FC = () => {
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -11,7 +13,8 @@ const Header: React.FC = () => {
 
   return (
     <nav className="border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <div className="max-w-[1024px] mx-auto flex flex-wrap items-center justify-between p-4">
+        {/* Botão de Toggle para o Menu */}
         <button
           type="button"
           onClick={toggleMenu}
@@ -36,13 +39,15 @@ const Header: React.FC = () => {
             />
           </svg>
         </button>
+
+        {/* Menu Links */}
         <div
           className={`w-full mt-4 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 ${
             isOpen ? "block" : "hidden"
           }`}
           id="navbar-hamburger"
         >
-          <ul className="flex flex-col font-medium">
+          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium">
             <li>
               <Link
                 href="/"
@@ -75,18 +80,24 @@ const Header: React.FC = () => {
               >
                 Contato
               </Link>
+            </li>
+            <li>
               <Link
                 href="/admin"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Admin
               </Link>
+            </li>
+            <li>
               <Link
                 href="/renter"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Locatários
               </Link>
+            </li>
+            <li>
               <Link
                 href="/admin/addUnit"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -97,15 +108,43 @@ const Header: React.FC = () => {
           </ul>
         </div>
 
-        <Link
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <img src="/images/property.png" className="h-8" alt="MeuLar" />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            MeuLar
-          </span>
-        </Link>
+        {/* Logo e Ações de Autenticação */}
+        <div className="flex items-center space-x-3">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
+            <img src="/images/property.png" className="h-8" alt="MeuLar" />
+            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              MeuLar
+            </span>
+          </Link>
+
+          {/* Ações de Login/Logout */}
+          <div className="flex items-center ml-4">
+            {session ? (
+              <>
+                <span className="text-sm text-white mr-4">
+                  Bem-vindo, {session.user?.name}!
+                </span>
+                <button
+                  onClick={() => signOut()}
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                >
+                  Sair
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => signIn()}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+              >
+                Entrar
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </nav>
   );

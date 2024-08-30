@@ -18,11 +18,7 @@
     "waterTax": "501",
     "electricityTax": "1",
     "internetTax": "12",
-    "imgUrl": [
-      "image1.jpeg",
-      "image2.jpeg",
-      "video.mp4"
-    ],
+    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -68,11 +64,7 @@
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": [
-      "image1.jpeg",
-      "image2.jpeg",
-      "video.mp4"
-    ],
+    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -117,11 +109,7 @@
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": [
-      "image1.jpeg",
-      "image2.jpeg",
-      "video.mp4"
-    ],
+    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -166,11 +154,7 @@
     "waterTax": "50",
     "electricityTax": "50",
     "internetTax": "100",
-    "imgUrl": [
-      "image1.jpeg",
-      "image2.jpeg",
-      "video.mp4"
-    ],
+    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -215,11 +199,7 @@
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": [
-      "image1.jpeg",
-      "image2.jpeg",
-      "video.mp4"
-    ],
+    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -264,11 +244,7 @@
     "waterTax": "50",
     "electricityTax": "80",
     "internetTax": "100",
-    "imgUrl": [
-      "image1.jpeg",
-      "image2.jpeg",
-      "video.mp4"
-    ],
+    "imgUrl": ["image1.jpeg", "image2.jpeg", "video.mp4"],
     "availableItems": [
       "Armários no quarto",
       "Armários nos banheiros",
@@ -295,7 +271,7 @@
     "renters": []
   },
   {
-    "idUnit": "0",
+    "idUnit": "7",
     "address": "Rua Deputado José Luís Ertal",
     "addressNumber": "31",
     "unitNumber": "1000",
@@ -314,15 +290,11 @@
     "electricityTax": "0,00",
     "internetTax": "0,00",
     "imgUrl": [],
-    "availableItems": [
-      "Armários no quarto",
-      "Ar condicionado",
-      "Home-office"
-    ],
+    "availableItems": ["Armários no quarto", "Ar condicionado", "Home-office"],
     "renters": []
   },
   {
-    "idUnit": "0",
+    "idUnit": "8",
     "address": "Travessa Iris Santiago",
     "addressNumber": "98",
     "unitNumber": "709",

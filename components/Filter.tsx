@@ -89,7 +89,7 @@ const Filter: React.FC<FilterProps> = ({ onFilter, units }) => {
   };
 
   return (
-    <div className="p-4 bg-white shadow-md rounded mb-6">
+    <div className="p-4 bg-white shadow-md rounded mb-6 max-w-[1024px] mx-auto">
       {/* Ajuste de grid para responsividade */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {/* Campo de Valor Máximo do Aluguel */}

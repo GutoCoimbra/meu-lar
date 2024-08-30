@@ -34,9 +34,9 @@ const Card: React.FC<CardProps> = ({
 }) => {
   const router = useRouter();
   const [imagesAndVideos, setImagesAndVideos] = useState<string[]>([]);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
-    // Simula a obtenção das URLs dos recursos
     const urls = [
       `/images/${idUnit}/image1.jpeg`,
       `/images/${idUnit}/image2.jpeg`,
@@ -82,6 +82,11 @@ const Card: React.FC<CardProps> = ({
     router.push(`/page/property/${idUnit}`);
   };
 
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFavorited(!isFavorited);
+  };
+
   return (
     <div
       className="border border-gray-200 rounded-lg shadow-md overflow-hidden relative max-w-xs mx-auto cursor-pointer"
@@ -106,8 +111,40 @@ const Card: React.FC<CardProps> = ({
           )
         )}
       </Slider>
+      <div className="p-2 font-sans flex justify-between items-start">
+        <p className="text-xs text-gray-700 mb-0">{type}</p>{" "}
+        {/* Removido mb-1.5 para mb-0 */}
+        <button
+          onClick={toggleFavorite}
+          className="focus:outline-none"
+          aria-label="Favoritar"
+        >
+          {isFavorited ? (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="red"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          ) : (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="black"
+              strokeWidth="1"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          )}
+        </button>
+      </div>
       <div className="p-2 font-sans">
-        <p className="text-xs text-gray-700 mb-1.5">{type}</p>
         <p className="text-lg text-gray-700 font-bold mb-0">
           R${" "}
           {totalValue.toLocaleString("pt-BR", {

@@ -8,6 +8,7 @@
 /* Estilos globais adicionais */
 body {
   font-family: "Helvetica Neue", Arial, sans-serif; /* Substitua pela fonte que preferir */
+  overflow-x: hidden; /* Impede que o conteúdo ultrapasse a largura da tela */
 }
 
 a {
@@ -15,9 +16,18 @@ a {
   color: inherit;
 }
 
+header {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 1rem; /* Adicione padding para garantir que o conteúdo não encoste nas bordas */
+  overflow: hidden; /* Garante que o conteúdo não ultrapasse a largura máxima */
+  display: flex; /* Mantém o comportamento flex para o layout interno */
+  justify-content: space-between; /* Garante que o conteúdo seja espaçado corretamente */
+}
+
 /* Outros ajustes globais */
 
-/* styles/globals.css ou qualquer outro arquivo CSS global */
+/* Estilos para Slick Carousel */
 .slick-prev,
 .slick-next {
   z-index: 1; /* Garante que as setas estejam acima de outros elementos */
@@ -31,7 +41,7 @@ a {
   right: 20px; /* Ajuste conforme necessário */
 }
 
-/* styles/globals.css */
+/* Estilos para Dots Customizados */
 .custom-dot {
   width: 13px;
   height: 13px;
