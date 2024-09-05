@@ -1,47 +1,47 @@
 // Definição dos tipos para a tabela Unit
 export interface Unit {
-  idUnit: number;
-  address: string;
-  addressNumber: string;
-  unitNumber: string;
-  typeId?: number | null;
-  typeName?: string; // Novo campo para o nome do tipo
-  squareMeter: number;
-  rooms: number;
-  bathroom: number;
-  garage: number;
-  floor: number;
-  neighborhood: string;
-  city: string;
-  state: string;
-  zipcode: string;
-  available: boolean;
-  rentValue: number;
-  condominium: number;
-  waterTax: number;
-  electricityTax: number;
-  internetTax: number;
-  depositValue: number;
-  maintenanceFee: number;
-  lastMaintenanceDate?: Date | null;
-  imgUrl: string[];
-  accessInstructions: string;
-  documents: string[];
-  averageRating?: number | null;
-  petAllowed: boolean;
-  smokingAllowed: boolean;
-  listingStatus: string;
-  highlighted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  description: string;
-  features: string[];
-  furnished: boolean;
-  leaseStartDate?: Date | null;
-  leaseEndDate?: Date | null;
-  currentTenantId?: number | null;
-  rentalContractId?: number | null;
+  idUnit: number; // Chave primária autoincrementável
+  address: string; // Endereço
+  addressNumber: string; // Número do endereço
+  unitNumber: string; // Número da unidade
+  type: string; // Tipo de unidade
+  squareMeter: number; // Metragem quadrada com 2 casas decimais
+  rooms: number; // Número de quartos
+  garage: number; // Número de vagas na garagem
+  floor: number; // Número do andar
+  neighborhood: string; // Bairro
+  city: string; // Cidade
+  state: string; // Estado
+  zipcode: string; // CEP
+  available: boolean; // Disponibilidade (TRUE ou FALSE)
+  rentValue: number; // Valor do aluguel com 2 casas decimais
+  condominium: number; // Taxa de condomínio com 2 casas decimais
+  waterTax: number; // Taxa de água com 2 casas decimais
+  electricityTax: number; // Taxa de eletricidade com 2 casas decimais
+  internetTax: number; // Taxa de internet com 2 casas decimais
+  depositValue: number; // Valor do depósito
+  maintenanceFee: number; // Taxa de manutenção
+  lastMaintenanceDate: Date; // Data da última manutenção
+  imgUrl: string[]; // Array de URLs de imagem
+  securityFeatures: string[]; // Lista de recursos de segurança
+  accessInstructions: string; // Instruções de acesso ao imóvel
+  documents: string[]; // Array de URLs para documentos digitalizados
+  averageRating: number; // Classificação média do imóvel
+  petAllowed: boolean; // Indica se animais de estimação são permitidos
+  smokingAllowed: boolean; // Indica se é permitido fumar no imóvel
+  listingStatus: string; // Status do imóvel
+  highlighted: boolean; // Indica se o imóvel está destacado
+  createdAt: Date; // Data de criação
+  updatedAt: Date; // Data da última atualização
+  description: string; // Descrição do imóvel
+  features: string[]; // Características especiais do imóvel
+  furnished: boolean; // Indica se o imóvel é mobiliado
+  leaseStartDate: Date; // Data de início do contrato de locação
+  leaseEndDate: Date; // Data de término do contrato de locação
+  currentTenantId: number; // ID do locatário atual
+  rentalContractId: number; // ID do contrato de aluguel
 }
+
 // Definição dos tipos para a tabela RentalHistory
 export interface RentalHistory {
   id: number; // Chave primária autoincrementável para a tabela RentalHistory
@@ -161,9 +161,4 @@ export interface Notification {
   createdAt: Date; // Data de criação da notificação
   notificationType: string; // Tipo de notificação
   readAt: Date; // Data e hora em que a notificação foi lida
-}
-
-export interface Feature {
-  id: string;
-  name: string;
 }

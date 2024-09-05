@@ -7,11 +7,11 @@ const Login = () => {
   const router = useRouter();
 
   // Redireciona para a página inicial se o usuário estiver logado
-  useEffect(() => {
-    if (session) {
-      router.push("/"); // Redireciona para a página index.tsx
-    }
-  }, [session, router]);
+  // useEffect(() => {
+  //   if (session) {
+  //     router.push("/"); // Redireciona para a página index.tsx
+  //   }
+  // }, [session, router]);
 
   // Renderiza o componente de login ou a informação de logout
   return (

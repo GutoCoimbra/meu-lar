@@ -1,55 +1,61 @@
-// components/UnitForm.tsx
-import React, { useState } from "react";
-import { Unit } from "../types"; // Ajuste o caminho conforme necessário
+import React, { useState, useEffect } from "react";
+import { Unit, Feature } from "../types";
+import { fetchFeatures } from "../utils/api"; // Certifique-se de que este caminho esteja correto
 
 const UnitForm: React.FC = () => {
   const [formData, setFormData] = useState<Unit>({
-    idUnit: "0", // Este campo pode ser gerado automaticamente ou atribuído de outra forma
+    idUnit: 0,
     address: "",
     addressNumber: "",
     unitNumber: "",
     type: "",
-    squareMeter: "",
-    rooms: "",
-    garage: "",
+    squareMeter: 0,
+    rooms: 0,
+    garage: 0,
+    floor: 0,
     neighborhood: "",
     city: "",
     state: "",
     zipcode: "",
-    available: "sim",
-    rentValue: "",
-    condominium: "",
-    waterTax: "",
-    electricityTax: "",
-    internetTax: "",
+    available: false,
+    rentValue: 0,
+    condominium: 0,
+    waterTax: 0,
+    electricityTax: 0,
+    internetTax: 0,
+    depositValue: 0,
+    maintenanceFee: 0,
+    lastMaintenanceDate: null,
     imgUrl: [],
-    availableItems: [],
-    renters: [],
+    securityFeatures: [],
+    accessInstructions: "",
+    documents: [],
+    averageRating: null,
+    petAllowed: false,
+    smokingAllowed: false,
+    listingStatus: "",
+    highlighted: false,
+    description: "",
+    features: [],
+    furnished: false,
+    leaseStartDate: null,
+    leaseEndDate: null,
+    currentTenantId: null,
+    rentalContractId: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
-  const availableItemsOptions = [
-    "Armários no quarto",
-    "Armários nos banheiros",
-    "Armários na cozinha",
-    "Ar condicionado",
-    "Chuveiro a gás",
-    "Fogão incluso",
-    "Geladeira inclusa",
-    "Home-office",
-    "Quartos e corredores com portas amplas",
-    "Área de serviço",
-    "Banheira de hidromassagem",
-    "Varanda",
-    "Piscina privativa",
-    "Apartamento cobertura",
-    "Banheiro adaptado",
-    "Closet",
-    "Cozinha americana",
-    "Jardim",
-    "Quintal",
-    "Somente uma casa no terreno",
-    "Garden/Área Privativa",
-  ];
+  const [features, setFeatures] = useState<Feature[]>([]);
+
+  useEffect(() => {
+    const loadFeatures = async () => {
+      const fetchedFeatures = await fetchFeatures();
+      setFeatures(fetchedFeatures);
+    };
+
+    loadFeatures();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -57,24 +63,55 @@ const UnitForm: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevState) => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
   };
 
-  const handleCheckboxChange = (item: string) => {
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value === "" ? "" : Number(value),
+    }));
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value ? new Date(value) : null,
+    }));
+  };
+
+  const handleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldName: keyof Unit
+  ) => {
+    const { checked } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [fieldName]: checked,
+    }));
+  };
+
+  const handleCheckboxArrayChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldName: "securityFeatures" | "features"
+  ) => {
+    const { value, checked } = e.target;
     setFormData((prevState) => {
-      const items = prevState.availableItems.includes(item)
-        ? prevState.availableItems.filter((i) => i !== item)
-        : [...prevState.availableItems, item];
-      return { ...prevState, availableItems: items };
+      const updatedArray = checked
+        ? [...prevState[fieldName], value]
+        : prevState[fieldName].filter((item) => item !== value);
+      return { ...prevState, [fieldName]: updatedArray };
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Envio dos dados para a API
+
     try {
       const response = await fetch("/api/units", {
         method: "POST",
@@ -100,6 +137,8 @@ const UnitForm: React.FC = () => {
       onSubmit={handleSubmit}
       className="space-y-4 p-4 bg-white rounded shadow-md"
     >
+      {/* Campos do formulário para todos os atributos da entidade Unit */}
+
       <div>
         <label
           htmlFor="address"
@@ -113,7 +152,6 @@ const UnitForm: React.FC = () => {
           name="address"
           value={formData.address}
           onChange={handleInputChange}
-          placeholder="Endereço"
           className="border p-2 rounded w-full"
         />
       </div>
@@ -131,7 +169,6 @@ const UnitForm: React.FC = () => {
           name="addressNumber"
           value={formData.addressNumber}
           onChange={handleInputChange}
-          placeholder="Número do Endereço"
           className="border p-2 rounded w-full"
         />
       </div>
@@ -149,7 +186,6 @@ const UnitForm: React.FC = () => {
           name="unitNumber"
           value={formData.unitNumber}
           onChange={handleInputChange}
-          placeholder="Número da Unidade"
           className="border p-2 rounded w-full"
         />
       </div>
@@ -161,19 +197,14 @@ const UnitForm: React.FC = () => {
         >
           Tipo de Imóvel
         </label>
-        <select
+        <input
+          type="text"
           id="type"
           name="type"
           value={formData.type}
           onChange={handleInputChange}
           className="border p-2 rounded w-full"
-        >
-          <option value="">Selecione o tipo de imóvel</option>
-          <option value="Casa">Casa</option>
-          <option value="Apartamento">Apartamento</option>
-          <option value="Kitnet">Kitnet</option>
-          <option value="Studio">Studio</option>
-        </select>
+        />
       </div>
 
       <div>
@@ -181,15 +212,14 @@ const UnitForm: React.FC = () => {
           htmlFor="squareMeter"
           className="block text-sm font-medium text-gray-700"
         >
-          Área em m²
+          Área (m²)
         </label>
         <input
-          type="text"
+          type="number"
           id="squareMeter"
           name="squareMeter"
           value={formData.squareMeter}
-          onChange={handleInputChange}
-          placeholder="Área em m²"
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
@@ -199,15 +229,14 @@ const UnitForm: React.FC = () => {
           htmlFor="rooms"
           className="block text-sm font-medium text-gray-700"
         >
-          Número de Quartos
+          Quartos
         </label>
         <input
-          type="text"
+          type="number"
           id="rooms"
           name="rooms"
           value={formData.rooms}
-          onChange={handleInputChange}
-          placeholder="Número de Quartos"
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
@@ -220,12 +249,28 @@ const UnitForm: React.FC = () => {
           Vagas de Garagem
         </label>
         <input
-          type="text"
+          type="number"
           id="garage"
           name="garage"
           value={formData.garage}
-          onChange={handleInputChange}
-          placeholder="Vagas de Garagem"
+          onChange={handleNumberChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="floor"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Andar
+        </label>
+        <input
+          type="number"
+          id="floor"
+          name="floor"
+          value={formData.floor}
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
@@ -243,7 +288,6 @@ const UnitForm: React.FC = () => {
           name="neighborhood"
           value={formData.neighborhood}
           onChange={handleInputChange}
-          placeholder="Bairro"
           className="border p-2 rounded w-full"
         />
       </div>
@@ -261,7 +305,6 @@ const UnitForm: React.FC = () => {
           name="city"
           value={formData.city}
           onChange={handleInputChange}
-          placeholder="Cidade"
           className="border p-2 rounded w-full"
         />
       </div>
@@ -279,7 +322,6 @@ const UnitForm: React.FC = () => {
           name="state"
           value={formData.state}
           onChange={handleInputChange}
-          placeholder="Estado"
           className="border p-2 rounded w-full"
         />
       </div>
@@ -297,7 +339,6 @@ const UnitForm: React.FC = () => {
           name="zipcode"
           value={formData.zipcode}
           onChange={handleInputChange}
-          placeholder="CEP"
           className="border p-2 rounded w-full"
         />
       </div>
@@ -309,16 +350,14 @@ const UnitForm: React.FC = () => {
         >
           Disponível
         </label>
-        <select
+        <input
+          type="checkbox"
           id="available"
           name="available"
-          value={formData.available}
-          onChange={handleInputChange}
-          className="border p-2 rounded w-full"
-        >
-          <option value="sim">Sim</option>
-          <option value="não">Não</option>
-        </select>
+          checked={formData.available}
+          onChange={(e) => handleCheckboxChange(e, "available")}
+          className="mr-2"
+        />
       </div>
 
       <div>
@@ -329,12 +368,11 @@ const UnitForm: React.FC = () => {
           Valor do Aluguel
         </label>
         <input
-          type="text"
+          type="number"
           id="rentValue"
           name="rentValue"
           value={formData.rentValue}
-          onChange={handleInputChange}
-          placeholder="Valor do Aluguel"
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
@@ -347,12 +385,11 @@ const UnitForm: React.FC = () => {
           Condomínio
         </label>
         <input
-          type="text"
+          type="number"
           id="condominium"
           name="condominium"
           value={formData.condominium}
-          onChange={handleInputChange}
-          placeholder="Condomínio"
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
@@ -365,12 +402,11 @@ const UnitForm: React.FC = () => {
           Taxa de Água
         </label>
         <input
-          type="text"
+          type="number"
           id="waterTax"
           name="waterTax"
           value={formData.waterTax}
-          onChange={handleInputChange}
-          placeholder="Taxa de Água"
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
@@ -383,12 +419,11 @@ const UnitForm: React.FC = () => {
           Taxa de Eletricidade
         </label>
         <input
-          type="text"
+          type="number"
           id="electricityTax"
           name="electricityTax"
           value={formData.electricityTax}
-          onChange={handleInputChange}
-          placeholder="Taxa de Eletricidade"
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
@@ -401,17 +436,71 @@ const UnitForm: React.FC = () => {
           Taxa de Internet
         </label>
         <input
-          type="text"
+          type="number"
           id="internetTax"
           name="internetTax"
           value={formData.internetTax}
-          onChange={handleInputChange}
-          placeholder="Taxa de Internet"
+          onChange={handleNumberChange}
           className="border p-2 rounded w-full"
         />
       </div>
 
-      <div className="space-y-2">
+      <div>
+        <label
+          htmlFor="depositValue"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Valor do Depósito
+        </label>
+        <input
+          type="number"
+          id="depositValue"
+          name="depositValue"
+          value={formData.depositValue}
+          onChange={handleNumberChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="maintenanceFee"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Taxa de Manutenção
+        </label>
+        <input
+          type="number"
+          id="maintenanceFee"
+          name="maintenanceFee"
+          value={formData.maintenanceFee}
+          onChange={handleNumberChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="lastMaintenanceDate"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Data da Última Manutenção
+        </label>
+        <input
+          type="date"
+          id="lastMaintenanceDate"
+          name="lastMaintenanceDate"
+          value={
+            formData.lastMaintenanceDate
+              ? formData.lastMaintenanceDate.toISOString().split("T")[0]
+              : ""
+          }
+          onChange={handleDateChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
         <label
           htmlFor="imgUrl"
           className="block text-sm font-medium text-gray-700"
@@ -422,9 +511,7 @@ const UnitForm: React.FC = () => {
           type="text"
           id="imgUrl"
           name="imgUrl"
-          value={
-            Array.isArray(formData.imgUrl) ? formData.imgUrl.join(", ") : ""
-          }
+          value={formData.imgUrl.join(", ")}
           onChange={(e) => {
             const imgUrls = e.target.value.split(",").map((url) => url.trim());
             setFormData({ ...formData, imgUrl: imgUrls });
@@ -433,20 +520,257 @@ const UnitForm: React.FC = () => {
         />
       </div>
 
-      {/* Checkboxes para availableItems */}
-      <div className="space-y-2">
-        <h4 className="font-semibold">Itens Disponíveis</h4>
-        {availableItemsOptions.map((item) => (
-          <label key={item} className="block">
-            <input
-              type="checkbox"
-              checked={formData.availableItems.includes(item)}
-              onChange={() => handleCheckboxChange(item)}
-              className="mr-2"
-            />
-            {item}
-          </label>
-        ))}
+      <div>
+        <label
+          htmlFor="accessInstructions"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Instruções de Acesso
+        </label>
+        <textarea
+          id="accessInstructions"
+          name="accessInstructions"
+          value={formData.accessInstructions}
+          onChange={handleInputChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="documents"
+          className="block text-sm font-medium text-gray-700"
+        >
+          URLs de Documentos (separadas por vírgula)
+        </label>
+        <input
+          type="text"
+          id="documents"
+          name="documents"
+          value={formData.documents.join(", ")}
+          onChange={(e) => {
+            const docs = e.target.value.split(",").map((doc) => doc.trim());
+            setFormData({ ...formData, documents: docs });
+          }}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="averageRating"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Avaliação Média
+        </label>
+        <input
+          type="number"
+          id="averageRating"
+          name="averageRating"
+          value={formData.averageRating ?? ""}
+          onChange={handleNumberChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="petAllowed"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Permite Animais de Estimação
+        </label>
+        <input
+          type="checkbox"
+          id="petAllowed"
+          name="petAllowed"
+          checked={formData.petAllowed}
+          onChange={(e) => handleCheckboxChange(e, "petAllowed")}
+          className="mr-2"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="smokingAllowed"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Permite Fumar
+        </label>
+        <input
+          type="checkbox"
+          id="smokingAllowed"
+          name="smokingAllowed"
+          checked={formData.smokingAllowed}
+          onChange={(e) => handleCheckboxChange(e, "smokingAllowed")}
+          className="mr-2"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="listingStatus"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Status do Imóvel
+        </label>
+        <input
+          type="text"
+          id="listingStatus"
+          name="listingStatus"
+          value={formData.listingStatus}
+          onChange={handleInputChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="highlighted"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Destaque
+        </label>
+        <input
+          type="checkbox"
+          id="highlighted"
+          name="highlighted"
+          checked={formData.highlighted}
+          onChange={(e) => handleCheckboxChange(e, "highlighted")}
+          className="mr-2"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Descrição
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      {/* Características Especiais */}
+      <div>
+        <h4 className="block text-sm font-medium text-gray-700">
+          Características Especiais
+        </h4>
+        {features.length > 0 ? (
+          features.map((feature) => (
+            <label key={feature.id} className="flex items-center">
+              <input
+                type="checkbox"
+                value={feature.id}
+                checked={formData.features.includes(feature.id)}
+                onChange={(e) => handleCheckboxArrayChange(e, "features")}
+                className="mr-2"
+              />
+              {feature.name}
+            </label>
+          ))
+        ) : (
+          <p>Nenhuma característica especial disponível.</p>
+        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="furnished"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Mobiliado
+        </label>
+        <input
+          type="checkbox"
+          id="furnished"
+          name="furnished"
+          checked={formData.furnished}
+          onChange={(e) => handleCheckboxChange(e, "furnished")}
+          className="mr-2"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="leaseStartDate"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Data de Início do Contrato
+        </label>
+        <input
+          type="date"
+          id="leaseStartDate"
+          name="leaseStartDate"
+          value={
+            formData.leaseStartDate
+              ? formData.leaseStartDate.toISOString().split("T")[0]
+              : ""
+          }
+          onChange={handleDateChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="leaseEndDate"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Data de Término do Contrato
+        </label>
+        <input
+          type="date"
+          id="leaseEndDate"
+          name="leaseEndDate"
+          value={
+            formData.leaseEndDate
+              ? formData.leaseEndDate.toISOString().split("T")[0]
+              : ""
+          }
+          onChange={handleDateChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="currentTenantId"
+          className="block text-sm font-medium text-gray-700"
+        >
+          ID do Locatário Atual
+        </label>
+        <input
+          type="number"
+          id="currentTenantId"
+          name="currentTenantId"
+          value={formData.currentTenantId ?? ""}
+          onChange={handleNumberChange}
+          className="border p-2 rounded w-full"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="rentalContractId"
+          className="block text-sm font-medium text-gray-700"
+        >
+          ID do Contrato de Aluguel
+        </label>
+        <input
+          type="number"
+          id="rentalContractId"
+          name="rentalContractId"
+          value={formData.rentalContractId ?? ""}
+          onChange={handleNumberChange}
+          className="border p-2 rounded w-full"
+        />
       </div>
 
       <button

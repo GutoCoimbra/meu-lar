@@ -38,17 +38,9 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
     onSubmit(formData);
   };
 
-  const handleCheckboxChange = (item: string) => {
-    setFormData((prevState) => {
-      const items = prevState.availableItems.includes(item)
-        ? prevState.availableItems.filter((i) => i !== item)
-        : [...prevState.availableItems, item];
-      return { ...prevState, availableItems: items };
-    });
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Campo de Endereço */}
       <div>
         <label htmlFor="address" className="block font-medium">
           Endereço
@@ -63,6 +55,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Número do Endereço */}
       <div>
         <label htmlFor="addressNumber" className="block font-medium">
           Número do Endereço
@@ -77,6 +70,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Número da Unidade */}
       <div>
         <label htmlFor="unitNumber" className="block font-medium">
           Número da Unidade
@@ -91,6 +85,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Tipo de Imóvel */}
       <div>
         <label htmlFor="type" className="block font-medium">
           Tipo de Imóvel
@@ -110,12 +105,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         </select>
       </div>
 
+      {/* Campo Metros Quadrados */}
       <div>
         <label htmlFor="squareMeter" className="block font-medium">
           Metros Quadrados
         </label>
         <input
-          type="text"
+          type="number"
           id="squareMeter"
           name="squareMeter"
           value={formData.squareMeter}
@@ -124,12 +120,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Quartos */}
       <div>
         <label htmlFor="rooms" className="block font-medium">
           Quartos
         </label>
         <input
-          type="text"
+          type="number"
           id="rooms"
           name="rooms"
           value={formData.rooms}
@@ -138,12 +135,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Garagem */}
       <div>
         <label htmlFor="garage" className="block font-medium">
           Garagem
         </label>
         <input
-          type="text"
+          type="number"
           id="garage"
           name="garage"
           value={formData.garage}
@@ -152,6 +150,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Bairro */}
       <div>
         <label htmlFor="neighborhood" className="block font-medium">
           Bairro
@@ -166,6 +165,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Cidade */}
       <div>
         <label htmlFor="city" className="block font-medium">
           Cidade
@@ -180,6 +180,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Estado */}
       <div>
         <label htmlFor="state" className="block font-medium">
           Estado
@@ -194,6 +195,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo CEP */}
       <div>
         <label htmlFor="zipcode" className="block font-medium">
           CEP
@@ -208,6 +210,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Disponível */}
       <div>
         <label htmlFor="available" className="block font-medium">
           Disponível
@@ -215,7 +218,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         <select
           id="available"
           name="available"
-          value={formData.available}
+          value={formData.available ? "sim" : "não"}
           onChange={handleChange}
           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
         >
@@ -224,12 +227,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         </select>
       </div>
 
+      {/* Campo Valor do Aluguel */}
       <div>
         <label htmlFor="rentValue" className="block font-medium">
           Valor do Aluguel
         </label>
         <input
-          type="text"
+          type="number"
           id="rentValue"
           name="rentValue"
           value={formData.rentValue}
@@ -238,12 +242,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Condomínio */}
       <div>
         <label htmlFor="condominium" className="block font-medium">
           Condomínio
         </label>
         <input
-          type="text"
+          type="number"
           id="condominium"
           name="condominium"
           value={formData.condominium}
@@ -252,12 +257,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Taxa de Água */}
       <div>
         <label htmlFor="waterTax" className="block font-medium">
           Taxa de Água
         </label>
         <input
-          type="text"
+          type="number"
           id="waterTax"
           name="waterTax"
           value={formData.waterTax}
@@ -266,12 +272,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Taxa de Energia */}
       <div>
         <label htmlFor="electricityTax" className="block font-medium">
           Taxa de Energia
         </label>
         <input
-          type="text"
+          type="number"
           id="electricityTax"
           name="electricityTax"
           value={formData.electricityTax}
@@ -280,12 +287,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Taxa de Internet */}
       <div>
         <label htmlFor="internetTax" className="block font-medium">
           Taxa de Internet
         </label>
         <input
-          type="text"
+          type="number"
           id="internetTax"
           name="internetTax"
           value={formData.internetTax}
@@ -294,6 +302,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Imagens e Vídeos */}
       <div>
         <label htmlFor="imgUrl" className="block font-medium">
           Imagens e Vídeos (URLs separados por vírgula)
@@ -303,7 +312,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
           name="imgUrl"
           value={
             Array.isArray(formData.imgUrl) ? formData.imgUrl.join(", ") : ""
-          } // Verificação de segurança
+          }
           onChange={(e) => {
             const imgUrls = e.target.value.split(",").map((url) => url.trim());
             setFormData({ ...formData, imgUrl: imgUrls });
@@ -312,6 +321,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
         />
       </div>
 
+      {/* Campo Inquilinos */}
       <div>
         <label htmlFor="renters" className="block font-medium">
           Inquilinos (IDs separados por vírgula)
@@ -321,53 +331,15 @@ const AdminForm: React.FC<AdminFormProps> = ({ unit, onSubmit }) => {
           name="renters"
           value={
             Array.isArray(formData.renters) ? formData.renters.join(", ") : ""
-          } // Verificação de segurança
+          }
           onChange={(e) => {
             const renters = e.target.value
               .split(",")
               .map((id) => Number(id.trim()));
-            setFormData({ ...formData, renters: renters });
+            setFormData({ ...formData, renters });
           }}
           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
         />
-      </div>
-
-      {/* Checkboxes para availableItems */}
-      <div className="space-y-2">
-        <h4 className="font-semibold">Itens Disponíveis</h4>
-        {[
-          "Armários no quarto",
-          "Armários nos banheiros",
-          "Armários na cozinha",
-          "Ar condicionado",
-          "Chuveiro a gás",
-          "Fogão incluso",
-          "Geladeira inclusa",
-          "Home-office",
-          "Quartos e corredores com portas amplas",
-          "Área de serviço",
-          "Banheira de hidromassagem",
-          "Varanda",
-          "Piscina privativa",
-          "Apartamento cobertura",
-          "Banheiro adaptado",
-          "Closet",
-          "Cozinha americana",
-          "Jardim",
-          "Quintal",
-          "Somente uma casa no terreno",
-          "Garden/Área Privativa",
-        ].map((item) => (
-          <label key={item} className="block">
-            <input
-              type="checkbox"
-              checked={formData.availableItems.includes(item)}
-              onChange={() => handleCheckboxChange(item)}
-              className="mr-2"
-            />
-            {item}
-          </label>
-        ))}
       </div>
 
       <button

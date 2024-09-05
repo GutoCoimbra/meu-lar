@@ -34,17 +34,17 @@ header {
 }
 
 .slick-prev {
-  left: 20px; /* Ajuste conforme necessário */
+  left: 25px; /* Ajuste conforme necessário */
 }
 
 .slick-next {
-  right: 20px; /* Ajuste conforme necessário */
+  right: 25px; /* Ajuste conforme necessário */
 }
 
 /* Estilos para Dots Customizados */
 .custom-dot {
-  width: 13px;
-  height: 13px;
+  width: 8px;
+  height: 8px;
   background-color: #fff;
   border-radius: 50%;
   cursor: pointer;

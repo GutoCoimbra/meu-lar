@@ -1,0 +1,210 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Unit {
+  idUnit              Int       @id @default(autoincrement())
+  address             String
+  addressNumber       String
+  unitNumber          String
+  typeId              Int?
+  squareMeter         Float
+  rooms               Int
+  bathroom            Int       @default(1) // Adiciona um valor padrão de 1
+  garage              Int
+  floor               Int
+  neighborhood        String
+  city                String
+  state               String
+  zipcode             String
+  available           Boolean
+  rentValue           Float
+  condominium         Float
+  waterTax            Float
+  electricityTax      Float
+  internetTax         Float
+  depositValue        Float
+  maintenanceFee      Float
+  lastMaintenanceDate DateTime?
+  imgUrl              String[]
+  accessInstructions  String
+  documents           String[]
+  averageRating       Float?
+  petAllowed          Boolean
+  smokingAllowed      Boolean
+  listingStatus       String
+  highlighted         Boolean
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  description         String
+  features            Feature[] @relation("UnitFeatures")
+  furnished           Boolean
+  leaseStartDate      DateTime?
+  leaseEndDate        DateTime?
+  currentTenantId     Int?
+  rentalContractId    Int?
+
+  rentalHistories     RentalHistory[] // Relacionamento inverso com RentalHistory
+  unitItems           UnitItem[]       // Relacionamento inverso com UnitItem
+  rentalContracts     RentalContract[] // Relacionamento inverso com RentalContract
+  maintenanceRequests MaintenanceRequest[] // Relacionamento inverso com MaintenanceRequest
+
+  unitType            UnitType? @relation(fields: [typeId], references: [idType])
+}
+
+model UnitType {
+  idType   Int    @id @default(autoincrement())
+  typeName String
+  units    Unit[] // Um tipo pode ter muitas unidades
+}
+
+model Feature {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  units Unit[] @relation("UnitFeatures")
+}
+
+model Renter {
+  idRenter                Int      @id @default(autoincrement())
+  nameRenter              String
+  emailRenter             String
+  phoneRenter             String
+  addressRenter           String
+  cpfRenter               BigInt
+  idtRenter               BigInt
+  idtSenderRenter         String
+  maritalStatusRenter     String
+  birthdateRenter         DateTime
+  ciaWorksRenter          String
+  admissionDataRenter     DateTime
+  salaryRenter            Float
+  idUnitIntended          Int?
+  bankAccount             String
+  paymentMethod           String
+  creditScore             Int
+  preferredContactMethod  String
+  newsletterSubscribed    Boolean
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  lastLogin               DateTime?
+  documentURL             String[]
+  emergencyContactName    String
+  emergencyContactRelationship String
+  emergencyContactPhone   String
+
+  rentalContracts         RentalContract[] // Relacionamento inverso com RentalContract
+}
+
+model RentalHistory {
+  id            Int      @id @default(autoincrement())
+  unitId        Int
+  tenantId      Int
+  startDate     DateTime
+  endDate       DateTime
+  feedback      String?
+  
+  unit          Unit     @relation(fields: [unitId], references: [idUnit])
+}
+
+model Item {
+  idItem        Int      @id @default(autoincrement())
+  name          String
+
+  unitItems     UnitItem[] // Relacionamento inverso com UnitItem
+}
+
+model UnitItem {
+  idUnitItem    Int      @id @default(autoincrement())
+  unitId        Int
+  itemId        Int
+
+  unit          Unit     @relation(fields: [unitId], references: [idUnit])
+  item          Item     @relation(fields: [itemId], references: [idItem])
+}
+
+model RentalContract {
+  idContract         Int      @id @default(autoincrement())
+  unitId             Int
+  renterId           Int
+  startDate          DateTime
+  endDate            DateTime
+  contractTerms      String
+  monthlyRent        Float
+  securityDeposit    Float
+  status             String
+  renewalOption      Boolean
+  penaltyTerms       String?
+  notes              String?
+
+  unit               Unit     @relation(fields: [unitId], references: [idUnit])
+  renter             Renter   @relation(fields: [renterId], references: [idRenter])
+  
+  payments           Payment[] // Relacionamento inverso com Payment
+}
+
+model Payment {
+  idPayment          Int      @id @default(autoincrement())
+  contractId         Int
+  paymentDate        DateTime
+  amount             Float
+  paymentMethod      String
+  paymentStatus      String
+  dueDate            DateTime
+  lateFee            Float?
+  paymentReference   String
+
+  rentalContract     RentalContract @relation(fields: [contractId], references: [idContract])
+}
+
+model MaintenanceRequest {
+  idRequest          Int      @id @default(autoincrement())
+  unitId             Int
+  requestDate        DateTime
+  description        String
+  status             String
+  assignedTo         String?
+  completionDate     DateTime?
+  priority           String
+  estimatedCost      Float
+  actualCost         Float?
+
+  unit               Unit     @relation(fields: [unitId], references: [idUnit])
+}
+
+model User {
+  idUser             Int      @id @default(autoincrement())
+  username           String   @unique
+  passwordHash       String
+  email              String   @unique
+  role               String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  phoneNumber        String
+  address            String
+  status             String
+
+  notifications      Notification[] // Relacionamento inverso com Notification
+}
+
+model Notification {
+  idNotification     Int      @id @default(autoincrement())
+  userId             Int
+  message            String
+  status             String
+  createdAt          DateTime @default(now())
+  notificationType   String
+  readAt             DateTime?
+
+  user               User     @relation(fields: [userId], references: [idUser])
+}
+

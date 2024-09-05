@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { GetStaticPaths, GetStaticProps } from "next";
-import fs from "fs";
-import path from "path";
+import PropertyFeatures from "../../../components/PropertyFeatures";
+import { GetServerSideProps } from "next";
 import Slider from "react-slick";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,64 +8,121 @@ import { ArrowPrev, ArrowNext } from "../../../components/Arrow";
 import Header from "@/components/Header";
 import PropertyCosts from "@/components/PropertyCosts";
 import AvailableItems from "@/components/AvailableItems";
+import { PrismaClient } from "@prisma/client";
 
-type Unit = {
-  idUnit: number;
-  address: string;
-  addressNumber: string;
-  unitNumber: string;
-  type: string;
-  squareMeter: string;
-  rooms: string;
-  garage: string;
-  neighborhood: string;
-  city: string;
-  state: string;
-  zipcode: string;
-  available: string;
-  rentValue: string;
-  condominium: string;
-  waterTax: string;
-  electricityTax: string;
-  internetTax: string;
-  imgUrl: string[];
-  description: string;
-  availableItems: string[];
-};
+const prisma = new PrismaClient();
 
 type Props = {
-  unit: Unit | null;
+  unit: {
+    idUnit: number;
+    address: string;
+    addressNumber: string;
+    unitNumber: string;
+    typeName?: string;
+    squareMeter: number;
+    rooms: number;
+    bathroom: number;
+    garage: number;
+    floor: number;
+    neighborhood: string;
+    city: string;
+    state: string;
+    zipcode: string;
+    available: boolean;
+    rentValue: number;
+    condominium: number;
+    waterTax: number;
+    electricityTax: number;
+    internetTax: number;
+    depositValue: number;
+    maintenanceFee: number;
+    lastMaintenanceDate: string | null;
+    averageRating: number | null;
+    createdAt: string;
+    updatedAt: string;
+    leaseStartDate: string | null;
+    leaseEndDate: string | null;
+    imgUrl: string | string[]; // imgUrl é string ou array de strings
+    description: string;
+    features: string[];
+    accessInstructions: string;
+    petAllowed: boolean;
+    smokingAllowed: boolean;
+    furnished: boolean;
+  } | null;
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const filePath = path.join(process.cwd(), "data", "units.json");
-  const jsonData = fs.readFileSync(filePath, "utf-8");
-  const units: Unit[] = JSON.parse(jsonData);
-
-  const paths = units.map((unit) => ({
-    params: { id: unit.idUnit.toString() },
-  }));
-
-  return {
-    paths,
-    fallback: "blocking",
-  };
-};
-
-export const getStaticProps: GetStaticProps<Props> = async (context) => {
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context
+) => {
   const id = context.params?.id as string;
-  const filePath = path.join(process.cwd(), "data", "units.json");
-  const jsonData = fs.readFileSync(filePath, "utf-8");
-  const units: Unit[] = JSON.parse(jsonData);
 
-  const unit = units.find((unit) => unit.idUnit.toString() === id) || null;
+  try {
+    const unit = await prisma.unit.findUnique({
+      where: { idUnit: Number(id) },
+      include: {
+        unitType: true,
+        features: true,
+      },
+    });
 
-  return {
-    props: {
-      unit,
-    },
-    revalidate: 60,
-  };
+    await prisma.$disconnect();
+
+    if (!unit) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const serializedUnit = {
+      ...unit,
+      typeName: unit.unitType?.typeName || "Tipo não especificado",
+      squareMeter: unit.squareMeter ?? 0,
+      rooms: unit.rooms ?? 0,
+      bathroom: unit.bathroom ?? 0,
+      garage: unit.garage ?? 0,
+      floor: unit.floor ?? 0,
+      rentValue: unit.rentValue ?? 0,
+      condominium: unit.condominium ?? 0,
+      waterTax: unit.waterTax ?? 0,
+      electricityTax: unit.electricityTax ?? 0,
+      internetTax: unit.internetTax ?? 0,
+      depositValue: unit.depositValue ?? 0,
+      maintenanceFee: unit.maintenanceFee ?? 0,
+      lastMaintenanceDate: unit.lastMaintenanceDate
+        ? unit.lastMaintenanceDate.toISOString()
+        : null,
+      averageRating: unit.averageRating ?? null,
+      createdAt: unit.createdAt.toISOString(),
+      updatedAt: unit.updatedAt.toISOString(),
+      leaseStartDate: unit.leaseStartDate
+        ? unit.leaseStartDate.toISOString()
+        : null,
+      leaseEndDate: unit.leaseEndDate ? unit.leaseEndDate.toISOString() : null,
+      features: unit.features ? unit.features.map((f) => f.name) : [],
+      accessInstructions: unit.accessInstructions || "",
+      petAllowed: unit.petAllowed,
+      smokingAllowed: unit.smokingAllowed,
+      furnished: unit.furnished,
+      imgUrl: unit.imgUrl
+        ? Array.isArray(unit.imgUrl)
+          ? unit.imgUrl
+          : [unit.imgUrl]
+        : [], // Forçar imgUrl para ser sempre um array
+      description: unit.description || "",
+    };
+
+    return {
+      props: {
+        unit: serializedUnit,
+      },
+    };
+  } catch (error) {
+    console.error("Erro ao buscar unidade:", error);
+    return {
+      notFound: true,
+    };
+  }
 };
 
 const PropertyPage = ({ unit }: Props) => {
@@ -85,18 +141,39 @@ const PropertyPage = ({ unit }: Props) => {
     zipcode,
     rentValue,
     description,
-    availableItems,
     condominium,
     waterTax,
     electricityTax,
     internetTax,
+    depositValue,
+    maintenanceFee,
+    lastMaintenanceDate,
+    averageRating,
+    createdAt,
+    updatedAt,
+    leaseStartDate,
+    leaseEndDate,
+    features,
+    accessInstructions,
+    petAllowed,
+    smokingAllowed,
+    furnished,
+    squareMeter,
+    rooms,
+    bathroom,
+    garage,
+    floor,
   } = unit;
 
   const [imagesAndVideos, setImagesAndVideos] = useState<string[]>([]);
 
   useEffect(() => {
-    const urls = imgUrl.map((fileName) => `/images/${idUnit}/${fileName}`);
-    setImagesAndVideos(urls);
+    if (Array.isArray(imgUrl)) {
+      setImagesAndVideos(imgUrl);
+    } else if (typeof imgUrl === "string") {
+      const parsedUrls = imgUrl.split(",").map((url) => url.trim());
+      setImagesAndVideos(parsedUrls);
+    }
   }, [idUnit, imgUrl]);
 
   const settings = {
@@ -107,6 +184,23 @@ const PropertyPage = ({ unit }: Props) => {
     slidesToScroll: 1,
     prevArrow: <ArrowPrev />,
     nextArrow: <ArrowNext />,
+    adaptiveHeight: true,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+    ],
     customPaging: (i: number) => (
       <div className="custom-dot w-3 h-3 bg-white rounded-full"></div>
     ),
@@ -124,6 +218,7 @@ const PropertyPage = ({ unit }: Props) => {
     if (typeof value === "string") {
       value = parseFloat(value.replace(/[^\d.,]/g, "").replace(",", "."));
     }
+
     if (isNaN(value)) return "Consumo por conta do locatário";
 
     return value.toLocaleString("pt-BR", {
@@ -132,17 +227,6 @@ const PropertyPage = ({ unit }: Props) => {
     });
   };
 
-  const rentValueNum =
-    parseFloat(rentValue.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-  const condominiumNum =
-    parseFloat(condominium.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-  const waterTaxNum =
-    parseFloat(waterTax.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-  const electricityTaxNum =
-    parseFloat(electricityTax.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-  const internetTaxNum =
-    parseFloat(internetTax.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-
   const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${zipcode}`;
 
   return (
@@ -150,32 +234,39 @@ const PropertyPage = ({ unit }: Props) => {
       <Header />
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
         {/* Imagens e Vídeos do Imóvel */}
-        <div className="relative h-64 w-full">
+        <div className="relative w-full">
           <Slider {...settings}>
-            {imagesAndVideos.map((src, index) => {
-              if (!src) return null;
+            {imagesAndVideos.length > 0 ? (
+              imagesAndVideos.map((src, index) => {
+                if (!src) return null;
 
-              const fileExtension = src.split(".").pop()?.toLowerCase() || "";
+                const fileExtension = src.split(".").pop()?.toLowerCase() || "";
 
-              return fileExtension === "mp4" ? (
-                <div key={index} className="relative h-64 w-full">
-                  <video
-                    src={src}
-                    controls
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div key={index} className="relative h-64 w-full">
-                  <Image
-                    src={src}
-                    alt={`Imagem do Imóvel ${index + 1}`}
-                    fill
-                    className="rounded-t-lg object-cover"
-                  />
-                </div>
-              );
-            })}
+                return fileExtension === "mp4" ? (
+                  <div key={index} className="relative h-64 w-full">
+                    <video
+                      src={src}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div key={index} className="relative h-64 w-full">
+                    <Image
+                      src={src}
+                      alt={`Imagem do Imóvel ${index + 1}`}
+                      fill
+                      style={{ objectFit: "cover" }}
+                      className="rounded-t-lg"
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <div className="relative h-64 w-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">Nenhuma imagem disponível</span>
+              </div>
+            )}
           </Slider>
         </div>
 
@@ -201,18 +292,36 @@ const PropertyPage = ({ unit }: Props) => {
 
           {/* Custos do Imóvel */}
           <PropertyCosts
-            rentValueNum={rentValueNum}
-            condominiumNum={condominiumNum}
-            waterTaxNum={waterTaxNum}
-            electricityTaxNum={electricityTaxNum}
-            internetTaxNum={internetTaxNum}
+            rentValueNum={rentValue}
+            condominiumNum={condominium}
+            waterTaxNum={waterTax}
+            electricityTaxNum={electricityTax}
+            internetTaxNum={internetTax}
             formatCurrency={formatCurrency}
           />
 
-          <p className="text-gray-600 mb-4">{description}</p>
+          {/* Características do Imóvel */}
+          <PropertyFeatures
+            squareMeter={squareMeter}
+            rooms={rooms}
+            bathroom={bathroom}
+            garage={garage}
+            floor={floor}
+            petAllowed={petAllowed}
+            furnished={furnished}
+            elevator={true} // Passe o valor correto para elevator
+          />
 
           {/* Itens Disponíveis */}
-          <AvailableItems availableItems={availableItems} />
+          <AvailableItems
+            features={features}
+            accessInstructions={accessInstructions}
+            averageRating={averageRating ?? 0}
+            petAllowed={petAllowed}
+            smokingAllowed={smokingAllowed}
+            description={description}
+            furnished={furnished}
+          />
         </div>
       </div>
 

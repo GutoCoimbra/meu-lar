@@ -13,11 +13,11 @@ export default function SignIn({ providers }: SignInProps) {
   const router = useRouter();
 
   // Verifica se o usuário já está autenticado e redireciona
-  useEffect(() => {
-    if (session) {
-      router.push("/"); // Redireciona para a página inicial ou outra página desejada
-    }
-  }, [session, router]);
+  // useEffect(() => {
+  //   if (session) {
+  //     router.push("/"); // Redireciona para a página inicial ou outra página desejada
+  //   }
+  // }, [session, router]);
 
   // Enquanto a sessão está carregando, pode exibir um indicador de carregamento
   if (status === "loading") {

@@ -1,6 +1,5 @@
-// pages/index.tsx
-import { useState, useEffect } from "react";
-import type { NextPage, GetStaticProps } from "next";
+import { useState, useEffect, useMemo } from "react";
+import type { NextPage, GetServerSideProps } from "next";
 import { useSession, signIn } from "next-auth/react";
 import Header from "../components/Header";
 import Card from "../components/Card";
@@ -17,23 +16,22 @@ const Home: NextPage<HomeProps> = ({ units }) => {
 
   // Evitar navegação desnecessária
   useEffect(() => {
-    if (status === "unauthenticated") {
-      signIn();
-    }
+    // if (status === "unauthenticated") {
+    //   signIn();
+    // }
   }, [status]);
 
+  // Memorize the filtered units to avoid unnecessary re-renders
+  const memoizedFilteredUnits = useMemo(() => filteredUnits, [filteredUnits]);
+
   const handleFilter = (filters: {
-    maxRentValue: number;
     address: string;
     neighborhood: string;
     city: string;
     state: string;
   }) => {
     const filtered = units.filter((unit) => {
-      const rentValue = Number(unit.rentValue.replace(/[^0-9.-]+/g, "")); // Converte string para número
-
       const matchesFilter =
-        rentValue <= filters.maxRentValue &&
         (filters.state === "" || unit.state === filters.state) &&
         (filters.city === "" || unit.city === filters.city) &&
         (filters.neighborhood === "" ||
@@ -50,15 +48,6 @@ const Home: NextPage<HomeProps> = ({ units }) => {
     return <p className="text-center">Carregando...</p>;
   }
 
-  // Verifique se a sessão existe antes de renderizar a página
-  if (!session) {
-    return (
-      <p className="text-center">
-        Você precisa estar logado para ver as unidades disponíveis.
-      </p>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 overflow-y-auto">
       <Header />
@@ -68,14 +57,17 @@ const Home: NextPage<HomeProps> = ({ units }) => {
 
         {/* Contêiner dos cards com limite de largura e centralização */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {filteredUnits.length > 0 ? (
-            filteredUnits.map((unit, index) => (
+          {memoizedFilteredUnits.length > 0 ? (
+            memoizedFilteredUnits.map((unit, index) => (
               <Card
                 key={`${unit.idUnit}-${index}`}
-                idUnit={Number(unit.idUnit)} // Converte para número aqui
+                idUnit={unit.idUnit}
                 address={unit.address}
+                neighborhood={unit.neighborhood}
+                city={unit.city}
+                state={unit.state}
                 unitNumber={unit.unitNumber}
-                type={unit.type}
+                typeName={unit.typeName} // Passando o nome do tipo para o componente
                 rentValue={unit.rentValue}
                 condominium={unit.condominium}
                 waterTax={unit.waterTax}
@@ -84,6 +76,8 @@ const Home: NextPage<HomeProps> = ({ units }) => {
                 squareMeter={unit.squareMeter}
                 rooms={unit.rooms}
                 garage={unit.garage}
+                averageRating={unit.averageRating}
+                imgUrl={unit.imgUrl} // Adicionando imgUrl aqui
               />
             ))
           ) : (
@@ -97,17 +91,52 @@ const Home: NextPage<HomeProps> = ({ units }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+// Função para buscar os dados do servidor
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
-    const res = await fetch("http://localhost:3000/api/units");
-    if (!res.ok) {
-      throw new Error("Failed to fetch");
+    // Buscar unidades
+    const resUnits = await fetch("http://localhost:3000/api/units/units");
+    if (!resUnits.ok) {
+      throw new Error("Failed to fetch units");
     }
-    const units = await res.json();
+    const units: Unit[] = await resUnits.json();
 
-    const availableUnits = units.filter(
-      (unit: Unit) => unit.available === "sim"
+    // Se a resposta de unidades estiver vazia, retorne um array vazio
+    if (!units || units.length === 0) {
+      return { props: { units: [] } };
+    }
+
+    // Buscar tipos
+    const resTypes = await fetch("http://localhost:3000/api/unitType");
+    if (!resTypes.ok) {
+      throw new Error("Failed to fetch types");
+    }
+    const types = await resTypes.json();
+
+    // Se a resposta de tipos estiver vazia, retorne um array vazio
+    if (!types || types.length === 0) {
+      return { props: { units: [] } };
+    }
+
+    // Mapeia os tipos para facilitar o acesso pelo ID
+    const typeMap = types.reduce(
+      (
+        acc: { [key: number]: string },
+        type: { idType: number; typeName: string }
+      ) => {
+        acc[type.idType] = type.typeName;
+        return acc;
+      },
+      {}
     );
+
+    // Adiciona o nome do tipo ao objeto unit
+    const availableUnits = units
+      .filter((unit) => unit.available === true)
+      .map((unit) => ({
+        ...unit,
+        typeName: unit.typeId ? typeMap[unit.typeId] : "Tipo não especificado",
+      }));
 
     return {
       props: {
@@ -115,7 +144,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
       },
     };
   } catch (error) {
-    console.error("Failed to fetch units:", error);
+    console.error("Failed to fetch data in getServerSideProps:", error);
     return {
       props: {
         units: [],

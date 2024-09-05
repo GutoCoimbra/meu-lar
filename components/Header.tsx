@@ -121,28 +121,32 @@ const Header: React.FC = () => {
             </span>
           </Link>
 
-          {/* Ações de Login/Logout */}
+          {/* Ações de Login/Logout (comentado para desabilitar temporariamente) */}
           <div className="flex items-center ml-4">
-            {session ? (
-              <>
-                <span className="text-sm text-white mr-4">
-                  Bem-vindo, {session.user?.name}!
-                </span>
-                <button
-                  onClick={() => signOut()}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                >
-                  Sair
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => signIn()}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-              >
-                Entrar
-              </button>
-            )}
+            <span className="text-sm text-white mr-4">
+              Bem-vindo, Usuário Temporário!
+            </span>
+            {/* Comentar os botões de login/logout para desabilitar temporariamente */}
+            {/* {session ? (
+    <>
+      <span className="text-sm text-white mr-4">
+        Bem-vindo, {session.user?.name}!
+      </span>
+      <button
+        onClick={() => signOut()}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+      >
+        Sair
+      </button>
+    </>
+  ) : (
+    <button
+      onClick={() => signIn()}
+      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+    >
+      Entrar
+    </button>
+  )} */}
           </div>
         </div>
       </div>
