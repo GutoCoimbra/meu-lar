@@ -1,4 +1,3 @@
-// components/Header.tsx
 import { useState } from "react";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -47,8 +46,10 @@ const Header: React.FC = () => {
           }`}
           id="navbar-hamburger"
         >
-          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium">
-            <li>
+          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium items-center">
+            <li className="mx-2">
+              {" "}
+              {/* Adicionando espaçamento horizontal */}
               <Link
                 href="/"
                 className="block py-2 px-3 text-white bg-blue-700 rounded dark:bg-blue-600"
@@ -57,7 +58,7 @@ const Header: React.FC = () => {
                 Início
               </Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link
                 href="../components/UnitForm.tsx"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -65,7 +66,7 @@ const Header: React.FC = () => {
                 Unidades
               </Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link
                 href="/pricing"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -73,7 +74,7 @@ const Header: React.FC = () => {
                 O que preciso?
               </Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link
                 href="/contact"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -81,7 +82,7 @@ const Header: React.FC = () => {
                 Contato
               </Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link
                 href="/admin"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -89,7 +90,7 @@ const Header: React.FC = () => {
                 Admin
               </Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link
                 href="/renter"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -97,7 +98,7 @@ const Header: React.FC = () => {
                 Locatários
               </Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link
                 href="/admin/addUnit"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -109,45 +110,49 @@ const Header: React.FC = () => {
         </div>
 
         {/* Logo e Ações de Autenticação */}
-        <div className="flex items-center space-x-3">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse"
-          >
-            <img src="/images/property.png" className="h-8" alt="MeuLar" />
-            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              MeuLar
-            </span>
-          </Link>
 
-          {/* Ações de Login/Logout (comentado para desabilitar temporariamente) */}
-          <div className="flex items-center ml-4">
-            <span className="text-sm text-white mr-4">
-              Bem-vindo, Usuário Temporário!
-            </span>
-            {/* Comentar os botões de login/logout para desabilitar temporariamente */}
-            {/* {session ? (
-    <>
-      <span className="text-sm text-white mr-4">
-        Bem-vindo, {session.user?.name}!
-      </span>
-      <button
-        onClick={() => signOut()}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-      >
-        Sair
-      </button>
-    </>
-  ) : (
-    <button
-      onClick={() => signIn()}
-      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-    >
-      Entrar
-    </button>
-  )} */}
-          </div>
+        {/* Logo */}
+        <Link
+          href="/"
+          className="flex items-center space-x-3 rtl:space-x-reverse"
+        >
+          <img src="/images/property.png" className="h-8" alt="MeuLar" />
+          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+            MeuLar
+          </span>
+        </Link>
+
+        {/* Ações de Login/Logout */}
+        <div className="flex items-center ml-4">
+          {session ? (
+            <>
+              {/* Foto do usuário */}
+              {session.user?.image ? (
+                <img
+                  src={session.user.image}
+                  alt="User profile"
+                  className="w-8 h-8 rounded-full"
+                />
+              ) : (
+                <span className="text-sm text-white mr-4">
+                  Bem-vindo, {session.user?.name}!
+                </span>
+              )}
+              <button
+                onClick={() => signOut()}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+              >
+                Sair
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => signIn()}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+            >
+              Entrar
+            </button>
+          )}
         </div>
       </div>
     </nav>

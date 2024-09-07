@@ -8,15 +8,23 @@ const RenterForm: React.FC = () => {
     emailRenter: "",
     phoneRenter: "",
     addressRenter: "",
-    cpfRenter: 0,
-    idtRenter: 0,
+    cpfRenter: BigInt(0), // Inicializando como BigInt
+    idtRenter: BigInt(0), // Inicializando como BigInt
     idtSenderRenter: "",
     maritalStatusRenter: "",
-    birthdateRenter: "",
+    birthdateRenter: new Date(), // Inicializando como Date
     ciaWorksRenter: "",
-    admissionDataRenter: "",
+    admissionDataRenter: new Date(), // Inicializando como Date
     salaryRenter: 0,
-    idUnitIntended: 0,
+    bankAccount: "",
+    paymentMethod: "",
+    creditScore: 0,
+    preferredContactMethod: "",
+    newsletterSubscribed: false,
+    documentURL: [],
+    emergencyContactName: "",
+    emergencyContactRelationship: "",
+    emergencyContactPhone: "",
   });
 
   const handleChange = (
@@ -26,12 +34,12 @@ const RenterForm: React.FC = () => {
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "salaryRenter" ||
-        name === "cpfRenter" ||
-        name === "idtRenter" ||
-        name === "idRenter" ||
-        name === "idUnitIntended"
+        name === "salaryRenter" || name === "creditScore"
           ? Number(value)
+          : name === "cpfRenter" || name === "idtRenter"
+          ? BigInt(value) // Convertendo para BigInt
+          : name === "birthdateRenter" || name === "admissionDataRenter"
+          ? new Date(value) // Convertendo para Date
           : value,
     }));
   };
@@ -39,36 +47,53 @@ const RenterForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const serializedData = {
+      ...formData,
+      cpfRenter: formData.cpfRenter.toString(),
+      idtRenter: formData.idtRenter.toString(),
+      birthdateRenter: formData.birthdateRenter.toISOString(),
+      admissionDataRenter: formData.admissionDataRenter.toISOString(),
+    };
+
     try {
       const response = await fetch("/api/renters", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(serializedData),
       });
 
-      if (response.ok) {
-        console.log("Renter added successfully");
-        setFormData({
-          idRenter: 0,
-          nameRenter: "",
-          emailRenter: "",
-          phoneRenter: "",
-          addressRenter: "",
-          cpfRenter: 0,
-          idtRenter: 0,
-          idtSenderRenter: "",
-          maritalStatusRenter: "",
-          birthdateRenter: "",
-          ciaWorksRenter: "",
-          admissionDataRenter: "",
-          salaryRenter: 0,
-          idUnitIntended: 0,
-        });
-      } else {
-        console.error("Failed to add renter");
+      if (!response.ok) {
+        throw new Error("Failed to add renter");
       }
+
+      console.log("Renter added successfully");
+
+      setFormData({
+        idRenter: 0,
+        nameRenter: "",
+        emailRenter: "",
+        phoneRenter: "",
+        addressRenter: "",
+        cpfRenter: BigInt(0), // Resetando para BigInt
+        idtRenter: BigInt(0), // Resetando para BigInt
+        idtSenderRenter: "",
+        maritalStatusRenter: "",
+        birthdateRenter: new Date(), // Resetando para Date
+        ciaWorksRenter: "",
+        admissionDataRenter: new Date(), // Resetando para Date
+        salaryRenter: 0,
+        bankAccount: "",
+        paymentMethod: "",
+        creditScore: 0,
+        preferredContactMethod: "",
+        newsletterSubscribed: false,
+        documentURL: [],
+        emergencyContactName: "",
+        emergencyContactRelationship: "",
+        emergencyContactPhone: "",
+      });
     } catch (error) {
       console.error("An error occurred", error);
     }
@@ -79,20 +104,6 @@ const RenterForm: React.FC = () => {
       onSubmit={handleSubmit}
       className="max-w-md mx-auto p-4 bg-white shadow-md rounded"
     >
-      {/* ID do Locatário */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          ID do Locatário:
-        </label>
-        <input
-          type="number"
-          name="idRenter"
-          value={formData.idRenter}
-          onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
-
       {/* Nome do Locatário */}
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -155,9 +166,9 @@ const RenterForm: React.FC = () => {
           CPF:
         </label>
         <input
-          type="number"
+          type="text"
           name="cpfRenter"
-          value={formData.cpfRenter}
+          value={formData.cpfRenter.toString()} // Convertendo BigInt para string para exibição
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -169,9 +180,9 @@ const RenterForm: React.FC = () => {
           Identidade:
         </label>
         <input
-          type="number"
+          type="text"
           name="idtRenter"
-          value={formData.idtRenter}
+          value={formData.idtRenter.toString()} // Convertendo BigInt para string para exibição
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -213,7 +224,7 @@ const RenterForm: React.FC = () => {
         <input
           type="date"
           name="birthdateRenter"
-          value={formData.birthdateRenter}
+          value={formData.birthdateRenter.toISOString().substring(0, 10)} // Formatando a data para exibição
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -241,7 +252,7 @@ const RenterForm: React.FC = () => {
         <input
           type="date"
           name="admissionDataRenter"
-          value={formData.admissionDataRenter}
+          value={formData.admissionDataRenter.toISOString().substring(0, 10)} // Formatando a data para exibição
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
@@ -261,15 +272,43 @@ const RenterForm: React.FC = () => {
         />
       </div>
 
-      {/* ID da Unidade Desejada */}
+      {/* Contato de Emergência - Nome */}
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
-          ID da Unidade Desejada:
+          Nome do Contato de Emergência:
         </label>
         <input
-          type="number"
-          name="idUnitIntended"
-          value={formData.idUnitIntended}
+          type="text"
+          name="emergencyContactName"
+          value={formData.emergencyContactName}
+          onChange={handleChange}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+      </div>
+
+      {/* Contato de Emergência - Relacionamento */}
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Relacionamento do Contato de Emergência:
+        </label>
+        <input
+          type="text"
+          name="emergencyContactRelationship"
+          value={formData.emergencyContactRelationship}
+          onChange={handleChange}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+      </div>
+
+      {/* Contato de Emergência - Telefone */}
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Telefone do Contato de Emergência:
+        </label>
+        <input
+          type="tel"
+          name="emergencyContactPhone"
+          value={formData.emergencyContactPhone}
           onChange={handleChange}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />

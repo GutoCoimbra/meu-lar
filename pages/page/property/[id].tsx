@@ -232,7 +232,7 @@ const PropertyPage = ({ unit }: Props) => {
   return (
     <div className="p-0 bg-gray-100">
       <Header />
-      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
+      <div className="max-w-6xl mx-auto bg-white">
         {/* Imagens e Vídeos do Imóvel */}
         <div className="relative w-full">
           <Slider {...settings}>
@@ -257,7 +257,6 @@ const PropertyPage = ({ unit }: Props) => {
                       alt={`Imagem do Imóvel ${index + 1}`}
                       fill
                       style={{ objectFit: "cover" }}
-                      className="rounded-t-lg"
                     />
                   </div>
                 );
