@@ -21,7 +21,8 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/api/auth/[...nextauth]",
-    "types" // Adicione a pasta onde está o arquivo de declaração
+    "types", // Adicione a pasta onde está o arquivo de declaração
+    "components/AdminForm.tsx"
   ],
   "exclude": ["node_modules"]
 }
