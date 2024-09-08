@@ -80,9 +80,10 @@ const Filter: React.FC<FilterProps> = React.memo(({ onFilter, units }) => {
 
   return (
     <div className="p-4 bg-white shadow-md rounded mb-6 max-w-[1024px] mx-auto">
-      <span className="font-bold text-lg">
+      <span className="font-bold font-sans text-lg block mb-2">
         Encontre um lar para chamar de seu
       </span>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-gray-700">Estado</label>
