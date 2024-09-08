@@ -40,3 +40,4 @@ next-env.d.ts
 /pages/admin/addUnit.tsx
 /components/UnitForm.tsx
 /pages/add-unit.tsx
+/pages/admin/
