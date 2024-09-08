@@ -32,7 +32,6 @@ export default async function handler(
         maintenanceFee,
         lastMaintenanceDate,
         imgUrl,
-        securityFeatures,
         accessInstructions,
         documents,
         averageRating,
