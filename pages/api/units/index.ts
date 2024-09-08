@@ -13,7 +13,7 @@ export default async function handler(
         address,
         addressNumber,
         unitNumber,
-        type,
+        typeId, // Use typeId ao invés de type
         squareMeter,
         rooms,
         garage,
@@ -49,12 +49,13 @@ export default async function handler(
         rentalContractId,
       } = req.body;
 
+      // Certifique-se de que typeId seja válido e faça a relação corretamente
       const createdUnit = await prisma.unit.create({
         data: {
           address,
           addressNumber,
           unitNumber,
-          type,
+          typeId, // Relaciona com o UnitType
           squareMeter,
           rooms,
           garage,
@@ -75,7 +76,6 @@ export default async function handler(
             ? new Date(lastMaintenanceDate)
             : null,
           imgUrl,
-          securityFeatures,
           accessInstructions,
           documents,
           averageRating,
@@ -102,7 +102,11 @@ export default async function handler(
     }
   } else if (req.method === "GET") {
     try {
-      const units = await prisma.unit.findMany();
+      const units = await prisma.unit.findMany({
+        include: {
+          unitType: true, // Incluir o tipo da unidade nas respostas GET
+        },
+      });
       res.status(200).json(units);
     } catch (error) {
       console.error("Erro ao buscar unidades:", error);
