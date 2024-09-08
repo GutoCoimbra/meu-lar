@@ -93,7 +93,7 @@ const Card: React.FC<CardProps> = React.memo(
     };
 
     const handleClick = () => {
-      router.push(`/page/property/${idUnit}`);
+      router.push(`property/${idUnit}`);
     };
 
     const toggleFavorite = (e: React.MouseEvent) => {

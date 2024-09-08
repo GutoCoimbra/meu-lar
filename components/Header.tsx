@@ -60,7 +60,7 @@ const Header: React.FC = () => {
             </li>
             <li className="mx-2">
               <Link
-                href="../components/UnitForm.tsx"
+                href="/"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Unidades
@@ -68,7 +68,7 @@ const Header: React.FC = () => {
             </li>
             <li className="mx-2">
               <Link
-                href="/pricing"
+                href="/"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 O que preciso?
@@ -76,7 +76,7 @@ const Header: React.FC = () => {
             </li>
             <li className="mx-2">
               <Link
-                href="/contact"
+                href="/"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Contato
@@ -84,26 +84,10 @@ const Header: React.FC = () => {
             </li>
             <li className="mx-2">
               <Link
-                href="/admin"
+                href="/"
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Admin
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/renter"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Locatários
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/admin/addUnit"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Cadastrar Imóvel
               </Link>
             </li>
           </ul>
