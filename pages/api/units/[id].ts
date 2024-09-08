@@ -1,5 +1,3 @@
-// api/units/[id].ts
-
 import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
 import path from "path";
@@ -10,9 +8,16 @@ const unitsFilePath = path.join(process.cwd(), "data", "units.json");
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
-  // Verificar se o ID é fornecido
-  if (!id || typeof id !== "string") {
+  // Verificar se o ID é fornecido e convertê-lo para número
+  if (!id || Array.isArray(id)) {
     res.status(400).json({ message: "ID is required" });
+    return;
+  }
+
+  const numericId = Number(id);
+
+  if (isNaN(numericId)) {
+    res.status(400).json({ message: "Invalid ID format" });
     return;
   }
 
@@ -22,7 +27,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const units: Unit[] = JSON.parse(fileContents);
 
     // Encontrar a unidade específica pelo ID
-    const unitIndex = units.findIndex((u) => u.idUnit === id);
+    const unitIndex = units.findIndex((u) => u.idUnit === numericId);
 
     if (unitIndex === -1) {
       res.status(404).json({ message: "Unit not found" });
