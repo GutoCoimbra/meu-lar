@@ -94,8 +94,11 @@ const Home: NextPage<HomeProps> = ({ units }) => {
 // Função para buscar os dados do servidor
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
-    // Buscar unidades
-    const resUnits = await fetch("http://localhost:3000/api/units/units");
+    // Usar a variável de ambiente para a URL do site
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    // Buscar unidades através da API
+    const resUnits = await fetch(`${siteUrl}/api/units`);
     if (!resUnits.ok) {
       throw new Error("Failed to fetch units");
     }
@@ -106,17 +109,12 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
       return { props: { units: [] } };
     }
 
-    // Buscar tipos
-    const resTypes = await fetch("http://localhost:3000/api/unitType");
+    // Buscar tipos através da API
+    const resTypes = await fetch(`${siteUrl}/api/unitType`);
     if (!resTypes.ok) {
       throw new Error("Failed to fetch types");
     }
     const types = await resTypes.json();
-
-    // Se a resposta de tipos estiver vazia, retorne um array vazio
-    if (!types || types.length === 0) {
-      return { props: { units: [] } };
-    }
 
     // Mapeia os tipos para facilitar o acesso pelo ID
     const typeMap = types.reduce(
