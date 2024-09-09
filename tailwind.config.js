@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       maxWidth: {
-        custom: "430px", // Adiciona uma nova largura máxima personalizada
+        custom: "360px", // Adiciona uma nova largura máxima personalizada
       },
     },
   },
