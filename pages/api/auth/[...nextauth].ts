@@ -2,34 +2,20 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  throw new Error("Missing Google OAuth credentials");
+}
+
 export default NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     }),
-    // Adicione outros provedores que você está utilizando
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    jwt: true,
-  },
-  callbacks: {
-    async jwt({ token, account }) {
-      // Persist o token OAuth no token JWT
-      if (account) {
-        token.accessToken = account.access_token;
-      }
-      return token;
-    },
-    async session({ session, token, user }) {
-      // Envia o token ao client-side via a sessão
-      session.accessToken = token.accessToken;
-      return session;
-    },
-  },
 });
