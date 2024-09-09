@@ -3,52 +3,23 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import Slider from "react-slick";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { ArrowPrev, ArrowNext } from "../../components/Arrow";
 import Header from "@/components/Header";
 import PropertyCosts from "@/components/PropertyCosts";
 import PropertyFeatures from "@/components/PropertyFeatures";
+import { Unit } from "@/types"; // Importando a interface Unit do arquivo types.ts
 
-type Unit = {
-  idUnit: number;
-  address: string;
-  number: string;
-  unit: string;
-  type: string;
-  squareMeter: string;
-  rooms: string;
-  bathroom: string;
-  garage: string;
-  floor: string;
-  petAllowed: boolean;
-  furnished: boolean;
-  elevator: boolean;
-  neighborhood: string;
-  city: string;
-  state: string;
-  zipcode: string;
-  available: string;
-  rentValue: string;
-  condominium: string;
-  waterTax: string;
-  electricityTax: string;
-  internetTax: string;
-  imgUrl: string | string[];
-  description: string;
-  availableItems: string[];
-};
-
-type Props = {
+interface Props {
   unit: Unit | null;
-};
+}
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/units`);
-
     if (!res.ok) {
       throw new Error("Failed to fetch units");
     }
-
     const units = await res.json();
 
     const paths = units.map((unit: Unit) => ({
@@ -72,33 +43,55 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
   const id = context.params?.id as string;
 
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL}/api/units/${id}`
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    // Buscar os dados da unidade pelo ID
+    const resUnit = await fetch(`${siteUrl}/api/units/${id}`);
+    if (!resUnit.ok) {
+      return { notFound: true };
+    }
+    const unit = await resUnit.json();
+
+    // Buscar tipos através da API
+    const resTypes = await fetch(`${siteUrl}/api/unitType`);
+    if (!resTypes.ok) {
+      throw new Error("Failed to fetch types");
+    }
+    const types = await resTypes.json();
+
+    // Mapeia os tipos para facilitar o acesso pelo ID
+    const typeMap = types.reduce(
+      (
+        acc: { [key: number]: string },
+        type: { idType: number; typeName: string }
+      ) => {
+        acc[type.idType] = type.typeName;
+        return acc;
+      },
+      {}
     );
 
-    if (!res.ok) {
-      return {
-        notFound: true,
-      };
-    }
-
-    const unit = await res.json();
+    // Adiciona o nome do tipo à unidade
+    const unitWithTypeName = {
+      ...unit,
+      typeName: unit.typeId ? typeMap[unit.typeId] : "Tipo não especificado",
+    };
 
     return {
       props: {
-        unit: unit || null,
+        unit: unitWithTypeName,
       },
       revalidate: 60, // Revalidação dos dados a cada 60 segundos
     };
   } catch (error) {
     console.error("Erro ao buscar dados da unidade:", error);
-    return {
-      notFound: true,
-    };
+    return { notFound: true };
   }
 };
 
 const PropertyPage = ({ unit }: Props) => {
+  const router = useRouter();
+
   if (!unit) {
     return <div>Unidade não encontrada.</div>;
   }
@@ -128,29 +121,26 @@ const PropertyPage = ({ unit }: Props) => {
     elevator,
   } = unit;
 
-  const [imagesAndVideos, setImagesAndVideos] = useState<string[]>([]);
-  const prevImgUrlRef = useRef<string | string[] | null>(null);
-
-  // Memoize and parse the image URLs
-  const parsedUrls = useMemo(() => {
-    if (typeof imgUrl === "string") {
-      return imgUrl
-        .replace(/[{}]/g, "")
-        .split(",")
-        .map((url) => url.trim());
-    } else if (Array.isArray(imgUrl)) {
-      return imgUrl;
+  // Função para formatar valores como moeda
+  const formatCurrency = (value: number | string) => {
+    if (typeof value === "string") {
+      value = parseFloat(value.replace(/[^\d.,]/g, "").replace(",", "."));
     }
-    return [];
-  }, [imgUrl]);
+    if (isNaN(value)) return "Consumo por conta do locatário";
 
-  useEffect(() => {
-    if (prevImgUrlRef.current !== parsedUrls) {
-      prevImgUrlRef.current = parsedUrls;
-      setImagesAndVideos(parsedUrls);
-    }
-  }, [parsedUrls]);
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
 
+  const rentValueNum = parseFloat(rentValue.toString());
+  const condominiumNum = parseFloat(condominium.toString());
+  const waterTaxNum = parseFloat(waterTax.toString());
+  const electricityTaxNum = parseFloat(electricityTax.toString());
+  const internetTaxNum = parseFloat(internetTax.toString());
+
+  // Configurações para o Slider
   const settings = {
     dots: true,
     infinite: true,
@@ -172,33 +162,6 @@ const PropertyPage = ({ unit }: Props) => {
     ),
   };
 
-  const formatCurrency = (value: number | string) => {
-    if (typeof value === "string") {
-      value = parseFloat(value.replace(/[^\d.,]/g, "").replace(",", "."));
-    }
-    if (isNaN(value)) return "Consumo por conta do locatário";
-
-    return value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  };
-
-  const formatCurrencyValue = (value: number | string | null | undefined) => {
-    if (typeof value === "string") {
-      value = parseFloat(value.replace(/[^\d.,]/g, "").replace(",", "."));
-    }
-    return value || 0;
-  };
-
-  const rentValueNum = formatCurrencyValue(rentValue);
-  const condominiumNum = formatCurrencyValue(condominium);
-  const waterTaxNum = formatCurrencyValue(waterTax);
-  const electricityTaxNum = formatCurrencyValue(electricityTax);
-  const internetTaxNum = formatCurrencyValue(internetTax);
-
-  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${zipcode}`;
-
   return (
     <div className="p-0 bg-gray-100">
       <Header />
@@ -206,7 +169,7 @@ const PropertyPage = ({ unit }: Props) => {
         {/* Imagens e Vídeos do Imóvel */}
         <div className="relative h-64 w-full">
           <Slider {...settings}>
-            {imagesAndVideos.map((src, index) =>
+            {imgUrl.map((src, index) =>
               src.endsWith(".mp4") ? (
                 <div key={index}>
                   <video controls className="w-full h-64 object-cover">
@@ -230,21 +193,12 @@ const PropertyPage = ({ unit }: Props) => {
 
         {/* Detalhes do Imóvel */}
         <div className="p-2">
+          <p className="text-xs text-gray-700 mb-0 align-bottom">
+            {unit.typeName ? unit.typeName : "Tipo não especificado"}
+          </p>
           <span className="text-1xl font-bold">
             {address} - {neighborhood} - {city} - {state}
           </span>
-
-          {/* Link para o Google Maps */}
-          <div className="mb-4">
-            <a
-              href={googleMapsLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
-            >
-              Ver no Google Maps
-            </a>
-          </div>
 
           {/* Integração do PropertyCosts */}
           <PropertyCosts
@@ -258,11 +212,11 @@ const PropertyPage = ({ unit }: Props) => {
 
           {/* Integração do PropertyFeatures */}
           <PropertyFeatures
-            squareMeter={parseInt(squareMeter)}
-            rooms={parseInt(rooms)}
-            bathroom={parseInt(bathroom)}
-            garage={parseInt(garage)}
-            floor={parseInt(floor)}
+            squareMeter={squareMeter}
+            rooms={rooms}
+            bathroom={bathroom}
+            garage={garage}
+            floor={floor}
             petAllowed={petAllowed}
             furnished={furnished}
             elevator={elevator}

@@ -17,6 +17,7 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
   internetTaxNum,
   formatCurrency,
 }) => {
+  // Cálculo do custo total
   const totalCost =
     rentValueNum +
     condominiumNum +
@@ -38,7 +39,7 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
         <div className="flex justify-between">
           <p className="text-gray-700 text-xs">Condomínio</p>
           <p className="text-gray-700 text-xs text-right">
-            {condominiumNum ? formatCurrency(condominiumNum) : "não há "}
+            {condominiumNum ? formatCurrency(condominiumNum) : "não há"}
           </p>
         </div>
 
@@ -50,6 +51,7 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
               : "por conta do locatário"}
           </p>
         </div>
+
         <div className="flex justify-between">
           <p className="text-gray-700 text-xs">Luz</p>
           <p className="text-gray-700 text-xs text-right">
@@ -58,6 +60,7 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
               : "por conta do locatário"}
           </p>
         </div>
+
         <div className="flex justify-between">
           <p className="text-gray-700 text-xs">Internet</p>
           <p className="text-gray-700 text-xs text-right">
@@ -67,6 +70,8 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Total */}
       <div className="border-t border-gray-300 mt-2 pt-2">
         <div className="flex justify-between">
           <p className="text-sm font-bold">Total</p>

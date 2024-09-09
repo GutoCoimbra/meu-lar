@@ -16,6 +16,8 @@ export interface Unit {
   state: string;
   zipcode: string;
   available: boolean;
+  availableItems: string[];
+  elevator: boolean;
   rentValue: number;
   condominium: number;
   waterTax: number;
