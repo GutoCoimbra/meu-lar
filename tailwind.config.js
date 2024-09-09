@@ -5,7 +5,11 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      maxWidth: {
+        custom: "430px", // Adiciona uma nova largura máxima personalizada
+      },
+    },
   },
   plugins: [],
 };

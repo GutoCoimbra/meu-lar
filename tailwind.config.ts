@@ -8,9 +8,6 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      maxWidth: {
-        "xs-custom": "320px", // Adiciona uma nova largura máxima personalizada
-      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
