@@ -43,7 +43,7 @@ type Props = {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/property`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/units`);
 
     if (!res.ok) {
       throw new Error("Failed to fetch units");
@@ -73,7 +73,7 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/property/${id}`
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/units/${id}`
     );
 
     if (!res.ok) {
