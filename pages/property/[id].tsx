@@ -220,7 +220,7 @@ const PropertyPage = ({ unit }: Props) => {
                     src={src}
                     alt={`Imagem ${index + 1}`}
                     fill
-                    className="rounded-t-lg object-cover"
+                    className="object-cover"
                   />
                 </div>
               )

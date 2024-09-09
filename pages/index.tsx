@@ -56,7 +56,7 @@ const Home: NextPage<HomeProps> = ({ units }) => {
         <Filter onFilter={handleFilter} units={units} />
 
         {/* Contêiner dos cards com limite de largura e centralização */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {memoizedFilteredUnits.length > 0 ? (
             memoizedFilteredUnits.map((unit, index) => (
               <Card
