@@ -7,7 +7,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const result = await query("SELECT * FROM unit_type");
+    // Alterar o nome da tabela para "UnitType"
+    const result = await query('SELECT * FROM "UnitType"');
     const types = result.rows;
     res.status(200).json(types);
   } catch (error) {

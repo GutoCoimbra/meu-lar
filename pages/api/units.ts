@@ -7,7 +7,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const result = await query("SELECT * FROM units WHERE available = true");
+    // Alterar para 'Unit' em vez de 'units'
+    const result = await query('SELECT * FROM "Unit" WHERE available = true');
     const units = result.rows;
     res.status(200).json(units);
   } catch (error) {
