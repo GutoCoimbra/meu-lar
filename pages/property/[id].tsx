@@ -229,7 +229,7 @@ const PropertyPage = ({ unit }: Props) => {
         </div>
 
         {/* Detalhes do Imóvel */}
-        <div className="p-6">
+        <div className="p-2">
           <span className="text-1xl font-bold">
             {address} - {neighborhood} - {city} - {state}
           </span>

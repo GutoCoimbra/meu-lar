@@ -103,7 +103,7 @@ const Card: React.FC<CardProps> = React.memo(
 
     return (
       <div
-        className="border border-gray-200 rounded-lg shadow-md overflow-hidden relative max-w-custom mx-auto cursor-pointer"
+        className="border border-gray-200 rounded-lg shadow-md overflow-hidden relative max-w-custom mx-auto cursor-pointer md:max-w-xs"
         onClick={handleClick}
       >
         <Slider {...settings}>
