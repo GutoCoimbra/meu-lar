@@ -100,6 +100,7 @@ const PropertyPage = ({ unit }: Props) => {
     idUnit,
     imgUrl,
     address,
+    unitNumber,
     neighborhood,
     city,
     state,
@@ -194,7 +195,8 @@ const PropertyPage = ({ unit }: Props) => {
         {/* Detalhes do Imóvel */}
         <div className="p-2">
           <p className="text-xs text-gray-700 mb-0 align-bottom">
-            {unit.typeName ? unit.typeName : "Tipo não especificado"}
+            {unit.typeName ? unit.typeName : "Tipo não especificado"}{" "}
+            {unitNumber}
           </p>
           <span className="text-1xl font-bold">
             {address} - {neighborhood} - {city} - {state}
