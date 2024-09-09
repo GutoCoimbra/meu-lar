@@ -26,7 +26,7 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
     internetTaxNum;
 
   return (
-    <div className="mb-4">
+    <div className="mt-4 mb-4">
       <h2 className="text-sm font-bold mb-2">Custos do Imóvel</h2>
       <div className="space-y-2">
         <div className="flex justify-between">

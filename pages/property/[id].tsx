@@ -163,6 +163,8 @@ const PropertyPage = ({ unit }: Props) => {
     ),
   };
 
+  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${zipcode}`;
+
   return (
     <div className="p-0 bg-gray-100">
       <Header />
@@ -198,9 +200,20 @@ const PropertyPage = ({ unit }: Props) => {
             {unit.typeName ? unit.typeName : "Tipo não especificado"}{" "}
             {unitNumber}
           </p>
+
           <span className="text-1xl font-bold">
             {address} - {neighborhood} - {city} - {state}
           </span>
+          <div className="mb-4">
+            <a
+              href={googleMapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              Ver no mapa
+            </a>
+          </div>
 
           {/* Integração do PropertyCosts */}
           <PropertyCosts
@@ -224,7 +237,7 @@ const PropertyPage = ({ unit }: Props) => {
             elevator={elevator}
           />
 
-          <p className="text-gray-600 mb-4">{description}</p>
+          <p className="text-gray-600 mb-4 mt-4">{description}</p>
 
           {/* Itens Disponíveis */}
           <div className="mt-8">
