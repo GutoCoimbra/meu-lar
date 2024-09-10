@@ -67,6 +67,8 @@ const PropertyPage = ({ unit }: Props) => {
     neighborhood,
     city,
     state,
+    unitNumber,
+    typeName,
     rentValue,
     description,
     condominium,
@@ -162,9 +164,12 @@ const PropertyPage = ({ unit }: Props) => {
         </div>
 
         <div className="p-2">
-          <h1 className="text-xl font-bold mb-4">
+          <h1 className="text-xl font-bold">
             {address}, {neighborhood} - {city}, {state}
           </h1>
+          <p className="text-xs text-gray-700 mb-0 align-bottom">
+            {typeName ? typeName : "Tipo não especificado"} {unitNumber}
+          </p>
 
           <PropertyCosts
             rentValueNum={rentValueNum}
@@ -186,8 +191,6 @@ const PropertyPage = ({ unit }: Props) => {
             elevator={elevator}
           />
 
-          <p className="text-gray-600 mt-4">{description}</p>
-
           <AvailableItems
             features={availableItems}
             accessInstructions="Use a chave digital"
@@ -199,7 +202,8 @@ const PropertyPage = ({ unit }: Props) => {
           />
 
           <div className="flex flex-col items-center justify-center">
-            <button onClick={() => window.history.back()} className="btn">
+            <VisitButton className="btn mb-2" />
+            <button onClick={() => window.history.back()} className="btn mb03">
               Voltar
             </button>
           </div>

@@ -125,7 +125,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
       </Slider>
       <div className="px-2 pt-2 font-sans flex justify-between items-start">
         <p className="text-xs text-gray-700 mb-0 align-bottom">
-          {typeName ? typeName : "Tipo não especificado"}
+          {typeName ? typeName : "Tipo não especificado"} {unitNumber}
         </p>
         <button
           onClick={toggleFavorite}
