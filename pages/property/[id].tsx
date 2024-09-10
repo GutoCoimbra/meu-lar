@@ -242,7 +242,7 @@ const PropertyPage = ({ unit }: Props) => {
           {/* Itens Disponíveis */}
           <div className="mt-8">
             <h2 className="text-sm font-bold mb-4">Itens Disponíveis</h2>
-            <ul className="text-xs list-disc list-inside pl-5">
+            <ul className="text-sm list-disc list-inside pl-5">
               {availableItems.length > 0 ? (
                 availableItems.map((item, index) => (
                   <li key={index} className="text-gray-700">
@@ -254,13 +254,13 @@ const PropertyPage = ({ unit }: Props) => {
               )}
             </ul>
           </div>
+          <div className="flex flex-col items-center justify-center">
+            <button className="btn mb-4">Agendar Visita</button>
+            <button onClick={() => window.history.back()} className="btn">
+              Voltar
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div className="flex justify-center mt-4">
-        <Link href="/" className="text-blue-500 hover:underline">
-          Voltar para a Página Inicial
-        </Link>
       </div>
     </div>
   );

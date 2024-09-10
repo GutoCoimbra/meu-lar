@@ -11,8 +11,8 @@ const Header: React.FC = () => {
   };
 
   return (
-    <nav className="border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
-      <div className="max-w-[1024px] mx-auto flex flex-wrap items-center justify-between p-4">
+    <nav className="border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 w-full">
+      <div className="max-w-[1024px] w-full mx-auto flex flex-wrap items-center justify-between p-4">
         {/* Botão de Toggle para o Menu */}
         <button
           type="button"
@@ -39,6 +39,46 @@ const Header: React.FC = () => {
           </svg>
         </button>
 
+        {/* Logo e Ações de Autenticação */}
+        <Link
+          href="/"
+          className="flex items-center space-x-3 rtl:space-x-reverse"
+        >
+          <img src="/images/property.png" className="h-8" alt="MeuLar" />
+          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+            MeuLar
+          </span>
+        </Link>
+
+        {/* Ações de Login/Logout */}
+        <div className="flex items-center ml-4">
+          {session ? (
+            <>
+              {session.user?.image ? (
+                <img
+                  src={session.user.image}
+                  alt="User profile"
+                  className="w-8 h-8 rounded-full"
+                />
+              ) : (
+                <span className="text-sm text-white mr-4">
+                  Bem-vindo, {session.user?.name}!
+                </span>
+              )}
+              <button
+                onClick={() => signOut()}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+              >
+                Sair
+              </button>
+            </>
+          ) : (
+            <button onClick={() => signIn()} className="btn">
+              Entrar
+            </button>
+          )}
+        </div>
+
         {/* Menu Links */}
         <div
           className={`w-full mt-4 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 ${
@@ -48,8 +88,6 @@ const Header: React.FC = () => {
         >
           <ul className="flex flex-col md:flex-row md:space-x-4 font-medium items-center">
             <li className="mx-2">
-              {" "}
-              {/* Adicionando espaçamento horizontal */}
               <Link
                 href="/"
                 className="block py-2 px-3 text-white bg-blue-700 rounded dark:bg-blue-600"
@@ -91,52 +129,6 @@ const Header: React.FC = () => {
               </Link>
             </li>
           </ul>
-        </div>
-
-        {/* Logo e Ações de Autenticação */}
-
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <img src="/images/property.png" className="h-8" alt="MeuLar" />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            MeuLar
-          </span>
-        </Link>
-
-        {/* Ações de Login/Logout */}
-        <div className="flex items-center ml-4">
-          {session ? (
-            <>
-              {/* Foto do usuário */}
-              {session.user?.image ? (
-                <img
-                  src={session.user.image}
-                  alt="User profile"
-                  className="w-8 h-8 rounded-full"
-                />
-              ) : (
-                <span className="text-sm text-white mr-4">
-                  Bem-vindo, {session.user?.name}!
-                </span>
-              )}
-              <button
-                onClick={() => signOut()}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-              >
-                Sair
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => signIn()}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-            >
-              Entrar
-            </button>
-          )}
         </div>
       </div>
     </nav>

@@ -30,22 +30,22 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
       <h2 className="text-sm font-bold mb-2">Custos do Imóvel</h2>
       <div className="space-y-2">
         <div className="flex justify-between">
-          <p className="text-gray-700 text-xs">Aluguel</p>
-          <p className="text-gray-700 text-xs text-right">
+          <p className="text-gray-700 text-sm">Aluguel</p>
+          <p className="text-gray-700 text-sm text-right">
             {formatCurrency(rentValueNum)}
           </p>
         </div>
 
         <div className="flex justify-between">
-          <p className="text-gray-700 text-xs">Condomínio</p>
-          <p className="text-gray-700 text-xs text-right">
+          <p className="text-gray-700 text-sm">Condomínio</p>
+          <p className="text-gray-700 text-sm text-right">
             {condominiumNum ? formatCurrency(condominiumNum) : "não há"}
           </p>
         </div>
 
         <div className="flex justify-between">
-          <p className="text-gray-700 text-xs">Água</p>
-          <p className="text-gray-700 text-xs text-right">
+          <p className="text-gray-700 text-sm">Água</p>
+          <p className="text-gray-700 text-sm text-right">
             {waterTaxNum
               ? formatCurrency(waterTaxNum)
               : "por conta do locatário"}
@@ -53,8 +53,8 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
         </div>
 
         <div className="flex justify-between">
-          <p className="text-gray-700 text-xs">Luz</p>
-          <p className="text-gray-700 text-xs text-right">
+          <p className="text-gray-700 text-sm">Luz</p>
+          <p className="text-gray-700 text-sm text-right">
             {electricityTaxNum
               ? formatCurrency(electricityTaxNum)
               : "por conta do locatário"}
@@ -62,8 +62,8 @@ const PropertyCosts: React.FC<PropertyCostsProps> = ({
         </div>
 
         <div className="flex justify-between">
-          <p className="text-gray-700 text-xs">Internet</p>
-          <p className="text-gray-700 text-xs text-right">
+          <p className="text-gray-700 text-sm">Internet</p>
+          <p className="text-gray-700 text-sm text-right">
             {internetTaxNum
               ? formatCurrency(internetTaxNum)
               : "por conta do locatário"}

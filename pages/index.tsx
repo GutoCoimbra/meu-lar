@@ -14,14 +14,12 @@ const Home: NextPage<HomeProps> = ({ units }) => {
   const { data: session, status } = useSession();
   const [filteredUnits, setFilteredUnits] = useState<Unit[]>(units);
 
-  // Evitar navegação desnecessária
   useEffect(() => {
     // if (status === "unauthenticated") {
     //   signIn();
     // }
   }, [status]);
 
-  // Memorize the filtered units to avoid unnecessary re-renders
   const memoizedFilteredUnits = useMemo(() => filteredUnits, [filteredUnits]);
 
   const handleFilter = (filters: {
@@ -50,9 +48,15 @@ const Home: NextPage<HomeProps> = ({ units }) => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 overflow-y-auto">
-      <Header />
+      {/* Limite de Largura aplicado ao Header */}
+      <div className="w-full">
+        <div className="max-w-[1024px] mx-auto">
+          <Header />
+        </div>
+      </div>
 
-      <div className="flex-1 container mx-auto px-4 py-4 max-w-[1024px]">
+      {/* Corpo principal da página */}
+      <div className="flex-1 container mx-auto py-4 max-w-[1024px]">
         <Filter onFilter={handleFilter} units={units} />
 
         {/* Contêiner dos cards com limite de largura e centralização */}
@@ -94,29 +98,24 @@ const Home: NextPage<HomeProps> = ({ units }) => {
 // Função para buscar os dados do servidor
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
-    // Usar a variável de ambiente para a URL do site
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-    // Buscar unidades através da API
     const resUnits = await fetch(`${siteUrl}/api/units`);
     if (!resUnits.ok) {
       throw new Error("Failed to fetch units");
     }
     const units: Unit[] = await resUnits.json();
 
-    // Se a resposta de unidades estiver vazia, retorne um array vazio
     if (!units || units.length === 0) {
       return { props: { units: [] } };
     }
 
-    // Buscar tipos através da API
     const resTypes = await fetch(`${siteUrl}/api/unitType`);
     if (!resTypes.ok) {
       throw new Error("Failed to fetch types");
     }
     const types = await resTypes.json();
 
-    // Mapeia os tipos para facilitar o acesso pelo ID
     const typeMap = types.reduce(
       (
         acc: { [key: number]: string },
@@ -128,7 +127,6 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
       {}
     );
 
-    // Adiciona o nome do tipo ao objeto unit
     const availableUnits = units
       .filter((unit) => unit.available === true)
       .map((unit) => ({
