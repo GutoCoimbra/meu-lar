@@ -86,7 +86,7 @@ const Header: React.FC = () => {
           }`}
           id="navbar-hamburger"
         >
-          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium items-center">
+          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium ">
             <li className="mx-2">
               <Link
                 href="/"
