@@ -2,13 +2,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "~slick-carousel/slick/slick.css";
-@import "~slick-carousel/slick/slick-theme.css";
+
+/* Importações para o Slick Carousel */
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
 
 /* Estilos globais adicionais */
 body {
-  font-family: "Helvetica Neue", Arial, sans-serif; /* Substitua pela fonte que preferir */
-  overflow-x: hidden; /* Impede que o conteúdo ultrapasse a largura da tela */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
 }
 
 a {
@@ -19,26 +21,24 @@ a {
 header {
   max-width: 1024px;
   margin: 0 auto;
-  padding: 0 1rem; /* Adicione padding para garantir que o conteúdo não encoste nas bordas */
-  overflow: hidden; /* Garante que o conteúdo não ultrapasse a largura máxima */
-  display: flex; /* Mantém o comportamento flex para o layout interno */
-  justify-content: space-between; /* Garante que o conteúdo seja espaçado corretamente */
+  padding: 0 1rem;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
 }
-
-/* Outros ajustes globais */
 
 /* Estilos para Slick Carousel */
 .slick-prev,
 .slick-next {
-  z-index: 1; /* Garante que as setas estejam acima de outros elementos */
+  z-index: 1;
 }
 
 .slick-prev {
-  left: 25px; /* Ajuste conforme necessário */
+  left: 25px;
 }
 
 .slick-next {
-  right: 25px; /* Ajuste conforme necessário */
+  right: 25px;
 }
 
 /* Estilos para Dots Customizados */
@@ -52,9 +52,10 @@ header {
 }
 
 .custom-dot.slick-active {
-  background-color: #0070f3; /* Ajuste para a cor desejada */
+  background-color: #0070f3;
 }
 
+/* Classe para Botão */
 .btn {
   @apply bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300 ease-in-out;
 }

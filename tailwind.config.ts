@@ -1,3 +1,4 @@
+// tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -8,6 +9,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      maxWidth: {
+        custom: "360px", // Adiciona uma nova largura máxima personalizada
+      },
+      borderRadius: {
+        full: "9999px", // Para garantir que o botão seja arredondado
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
