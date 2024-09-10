@@ -5,9 +5,14 @@ import { useSession, signIn, signOut } from "next-auth/react";
 const Header: React.FC = () => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const toggleProfileMenu = () => {
+    setProfileMenuOpen(!isProfileMenuOpen);
   };
 
   return (
@@ -51,26 +56,38 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Ações de Login/Logout */}
-        <div className="flex items-center ml-4">
+        <div className="relative flex items-center ml-4">
           {session ? (
             <>
               {session.user?.image ? (
                 <img
                   src={session.user.image}
                   alt="User profile"
-                  className="w-8 h-8 rounded-full"
+                  onClick={toggleProfileMenu}
+                  className="w-8 h-8 rounded-full cursor-pointer"
                 />
               ) : (
                 <span className="text-sm text-white mr-4">
                   Bem-vindo, {session.user?.name}!
                 </span>
               )}
-              <button
-                onClick={() => signOut()}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-              >
-                Sair
-              </button>
+
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2">
+                  <Link
+                    href="/meus-dados"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Meus Dados
+                  </Link>
+                  <button
+                    onClick={() => signOut()}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Sair
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             <button onClick={() => signIn()} className="btn">
