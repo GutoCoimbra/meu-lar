@@ -16,9 +16,9 @@ const Home: NextPage<HomeProps> = ({ units }) => {
 
   useEffect(() => {
     // Autenticação, se necessário
-    if (status === "unauthenticated") {
-      signIn();
-    }
+    // if (status === "unauthenticated") {
+    //   signIn();
+    // }
   }, [status]);
 
   const memoizedFilteredUnits = useMemo(() => filteredUnits, [filteredUnits]);
