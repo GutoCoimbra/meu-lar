@@ -26,7 +26,7 @@ export interface Unit {
   depositValue: number;
   maintenanceFee: number;
   lastMaintenanceDate?: Date | null;
-  imgUrl: string[];
+  imgUrl: string | string[];
   accessInstructions: string;
   documents: string[];
   averageRating?: number | null;

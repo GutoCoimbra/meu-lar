@@ -15,9 +15,10 @@ const Home: NextPage<HomeProps> = ({ units }) => {
   const [filteredUnits, setFilteredUnits] = useState<Unit[]>(units);
 
   useEffect(() => {
-    // if (status === "unauthenticated") {
-    //   signIn();
-    // }
+    // Autenticação, se necessário
+    if (status === "unauthenticated") {
+      signIn();
+    }
   }, [status]);
 
   const memoizedFilteredUnits = useMemo(() => filteredUnits, [filteredUnits]);
@@ -63,26 +64,7 @@ const Home: NextPage<HomeProps> = ({ units }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {memoizedFilteredUnits.length > 0 ? (
             memoizedFilteredUnits.map((unit, index) => (
-              <Card
-                key={`${unit.idUnit}-${index}`}
-                idUnit={unit.idUnit}
-                address={unit.address}
-                neighborhood={unit.neighborhood}
-                city={unit.city}
-                state={unit.state}
-                unitNumber={unit.unitNumber}
-                typeName={unit.typeName} // Passando o nome do tipo para o componente
-                rentValue={unit.rentValue}
-                condominium={unit.condominium}
-                waterTax={unit.waterTax}
-                electricityTax={unit.electricityTax}
-                internetTax={unit.internetTax}
-                squareMeter={unit.squareMeter}
-                rooms={unit.rooms}
-                garage={unit.garage}
-                averageRating={unit.averageRating}
-                imgUrl={unit.imgUrl} // Adicionando imgUrl aqui
-              />
+              <Card key={`${unit.idUnit}-${index}`} unit={unit} />
             ))
           ) : (
             <p className="text-center col-span-full">

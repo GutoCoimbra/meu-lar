@@ -1,4 +1,3 @@
-// components/PropertyFeatures.tsx
 import React from "react";
 
 interface PropertyFeaturesProps {
