@@ -107,6 +107,17 @@ const PropertyPage = ({ unit }: Props) => {
     slidesToScroll: 1,
     prevArrow: <ArrowPrev />,
     nextArrow: <ArrowNext />,
+    customPaging: (i: number) => (
+      <div className="custom-dot w-2 h-2 bg-white rounded-full"></div>
+    ),
+    appendDots: (dots: React.ReactNode) => (
+      <div
+        style={{ position: "absolute", bottom: "8px", width: "100%" }}
+        className="flex justify-center"
+      >
+        {dots}
+      </div>
+    ),
   };
 
   return (
