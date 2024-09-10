@@ -112,7 +112,7 @@ const PropertyPage = ({ unit }: Props) => {
     ),
     appendDots: (dots: React.ReactNode) => (
       <div
-        style={{ position: "absolute", bottom: "8px", width: "100%" }}
+        style={{ position: "absolute", bottom: "0px", width: "100%" }}
         className="flex justify-center"
       >
         {dots}
@@ -148,7 +148,7 @@ const PropertyPage = ({ unit }: Props) => {
           </Slider>
 
           {/* Adicionando o botão no canto inferior direito */}
-          <VisitButton className="absolute bottom-4 right-4 btnWhite" />
+          <VisitButton className="absolute bottom-5 btnWhite" />
         </div>
 
         <div className="p-2">
