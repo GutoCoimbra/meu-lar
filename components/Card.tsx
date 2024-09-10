@@ -14,7 +14,6 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
   const prevImgUrlRef = useRef<string | string[] | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  // Verifica se `unit` está definido antes de tentar desestruturar suas propriedades
   if (!unit) {
     return null; // Ou renderizar um loading state enquanto os dados são carregados
   }
@@ -42,7 +41,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
   const parsedUrls = useMemo(() => {
     if (typeof imgUrl === "string") {
       return imgUrl
-        .replace(/[{}]/g, "") // Garantimos que imgUrl é uma string antes de usar replace
+        .replace(/[{}]/g, "")
         .split(",")
         .map((url: string) => url.trim());
     } else if (Array.isArray(imgUrl)) {

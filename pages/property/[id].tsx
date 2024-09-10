@@ -6,7 +6,8 @@ import { ArrowPrev, ArrowNext } from "../../components/Arrow";
 import Header from "@/components/Header";
 import PropertyCosts from "@/components/PropertyCosts";
 import PropertyFeatures from "@/components/PropertyFeatures";
-import AvailableItems from "@/components/AvailableItems"; // Importação do componente ajustado
+import AvailableItems from "@/components/AvailableItems";
+import VisitButton from "@/components/VisitButton"; // Importação do VisitButton
 import { Unit } from "@/types";
 
 interface Props {
@@ -64,7 +65,6 @@ const PropertyPage = ({ unit }: Props) => {
     neighborhood,
     city,
     state,
-    zipcode,
     rentValue,
     description,
     condominium,
@@ -79,8 +79,8 @@ const PropertyPage = ({ unit }: Props) => {
     petAllowed,
     furnished,
     elevator,
-    averageRating = null, // Definir um valor padrão de `null` para evitar `undefined`
-    availableItems = [], // Adicionando lista de items disponíveis para passar ao componente
+    averageRating = null,
+    availableItems = [],
   } = unit;
 
   const formatCurrency = (value: number | string) => {
@@ -139,13 +139,16 @@ const PropertyPage = ({ unit }: Props) => {
                     <Image
                       src={src}
                       alt={`Imagem ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
                     />
                   </div>
                 )
               )}
           </Slider>
+
+          {/* Adicionando o botão no canto inferior direito */}
+          <VisitButton className="absolute bottom-4 right-4 btnWhite" />
         </div>
 
         <div className="p-2">
@@ -175,19 +178,17 @@ const PropertyPage = ({ unit }: Props) => {
 
           <p className="text-gray-600 mt-4">{description}</p>
 
-          {/* Itens Disponíveis - Usando o componente ajustado */}
           <AvailableItems
-            features={availableItems} // Passando os itens disponíveis como array
-            accessInstructions="Use a chave digital" // Exemplo de instruções de acesso
-            averageRating={averageRating} // Agora garantimos que `averageRating` nunca é `undefined`
+            features={availableItems}
+            accessInstructions="Use a chave digital"
+            averageRating={averageRating}
             petAllowed={petAllowed}
-            smokingAllowed={false} // Exemplo
+            smokingAllowed={false}
             description={description}
             furnished={furnished}
           />
 
           <div className="flex flex-col items-center justify-center">
-            <button className="btn mb-4">Agendar Visita</button>
             <button onClick={() => window.history.back()} className="btn">
               Voltar
             </button>
