@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Slider from "react-slick";
 import Image from "next/image";
@@ -56,6 +56,8 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
 };
 
 const PropertyPage = ({ unit }: Props) => {
+  const [currentSlide, setCurrentSlide] = useState(0); // Adicionar estado para controlar o slide ativo
+
   if (!unit) return <div>Unidade não encontrada.</div>;
 
   const {
@@ -107,8 +109,16 @@ const PropertyPage = ({ unit }: Props) => {
     slidesToScroll: 1,
     prevArrow: <ArrowPrev />,
     nextArrow: <ArrowNext />,
+    afterChange: (index: number) => {
+      setCurrentSlide(index); // Atualizar o slide atual quando o slide mudar
+    },
     customPaging: (i: number) => (
-      <div className="custom-dot w-2 h-2 bg-white rounded-full"></div>
+      <div
+        className={`custom-dot w-3 h-3 rounded-full ${
+          i === currentSlide ? "custom-dot-active" : "custom-dot-inactive"
+        }`}
+        style={{ transition: "background-color 0.3s ease" }}
+      ></div>
     ),
     appendDots: (dots: React.ReactNode) => (
       <div

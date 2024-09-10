@@ -5,7 +5,7 @@ import { ArrowPrev, ArrowNext } from "./Arrow";
 import { Unit } from "@/types"; // Importando a interface Unit do arquivo types.ts
 
 interface CardProps {
-  unit: Unit | null; // Permitir null para casos em que a unidade ainda não foi carregada
+  unit: Unit | null;
 }
 
 const Card: React.FC<CardProps> = React.memo(({ unit }) => {
@@ -13,9 +13,10 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
   const [imagesAndVideos, setImagesAndVideos] = useState<string[]>([]);
   const prevImgUrlRef = useRef<string | string[] | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0); // Estado para acompanhar o slide atual
 
   if (!unit) {
-    return null; // Ou renderizar um loading state enquanto os dados são carregados
+    return null;
   }
 
   const {
@@ -68,8 +69,16 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
     slidesToScroll: 1,
     prevArrow: <ArrowPrev />,
     nextArrow: <ArrowNext />,
+    afterChange: (index: number) => {
+      setCurrentSlide(index); // Atualiza o slide atual corretamente
+    },
     customPaging: (i: number) => (
-      <div className="custom-dot w-2 h-2 bg-white rounded-full"></div>
+      <div
+        className={`custom-dot w-3 h-3 rounded-full ${
+          i === currentSlide ? "custom-dot-active" : "custom-dot-inactive"
+        }`}
+        style={{ transition: "background-color 0.3s ease" }}
+      ></div>
     ),
     appendDots: (dots: React.ReactNode) => (
       <div
