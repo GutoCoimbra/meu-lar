@@ -4,6 +4,7 @@ import { Renter } from "../types";
 import { supabase } from "../utils/supabaseClient";
 import { uploadFileToFolder } from "../utils/uploadFile";
 import Header from "@/components/Header";
+import { useSession } from "next-auth/react";
 
 const RegisterPage: React.FC = () => {
   const router = useRouter();
@@ -45,19 +46,15 @@ const RegisterPage: React.FC = () => {
   });
 
   // Obtém a sessão e verifica se o usuário está autenticado
+  const { data: session, status } = useSession();
+
   useEffect(() => {
-    const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
-      } else if (renterId) {
-        loadRenterData(renterId); // Carrega os dados se o idRenter estiver disponível
-      }
-    };
-    getSession();
-  }, [router, renterId]);
+    if (status === "unauthenticated") {
+      router.push("/auth/signin"); // Redireciona para a página de login NextAuth se não estiver logado
+    } else if (renterId) {
+      loadRenterData(renterId); // Carrega os dados se o idRenter estiver disponível
+    }
+  }, [status, renterId, router]);
 
   // Carregar dados do locatário existente (caso já tenha sido salvo antes)
   const loadRenterData = async (idRenter: number) => {
