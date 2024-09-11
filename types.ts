@@ -61,6 +61,11 @@ export interface Renter {
   emailRenter: string; // E-mail do locatário
   phoneRenter: string; // Telefone do locatário
   addressRenter: string; // Endereço do locatário
+  addressNumber: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zipcode: string;
   cpfRenter: bigint; // CPF do locatário
   idtRenter: bigint; // Identidade do locatário
   idtSenderRenter: string; // Órgão emissor da identidade
