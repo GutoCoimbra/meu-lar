@@ -105,7 +105,13 @@ const RegisterPage: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+
+    // Se o campo for do tipo "date", converta a string para Date
+    if (e.target.type === "date") {
+      setFormData((prevData) => ({ ...prevData, [name]: new Date(value) }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   // Upload de arquivos
@@ -127,7 +133,7 @@ const RegisterPage: React.FC = () => {
   };
 
   const nextStep = async () => {
-    await saveData();
+    await saveData(); // Salva os dados antes de avançar para a próxima etapa
     setCurrentStep((prevStep) => prevStep + 1);
   };
 
@@ -139,6 +145,13 @@ const RegisterPage: React.FC = () => {
     await saveData();
     alert("Cadastro concluído com sucesso!");
     router.push("/");
+  };
+
+  // Corrige o erro com datas ao garantir que o valor seja formatado corretamente
+  const formatDate = (date: any) => {
+    return date instanceof Date && !isNaN(date.getTime())
+      ? date.toISOString().substring(0, 10)
+      : "";
   };
 
   // Renderiza o formulário completo com todos os campos de cada etapa
@@ -161,7 +174,7 @@ const RegisterPage: React.FC = () => {
             <input
               type="date"
               name="birthdateRenter"
-              value={formData.birthdateRenter.toString()}
+              value={formatDate(formData.birthdateRenter)}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2"
               required
@@ -336,9 +349,10 @@ const RegisterPage: React.FC = () => {
             <input
               type="date"
               name="admissionDataRenter"
-              value={formData.admissionDataRenter.toString()}
+              value={formatDate(formData.admissionDataRenter)}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2"
+              required
             />
             <label className="block text-gray-700">Salário</label>
             <input
