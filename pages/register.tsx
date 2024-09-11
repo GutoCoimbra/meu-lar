@@ -1,9 +1,16 @@
-// pages/register.tsx
-import Header from "@/components/Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { Renter } from "../types";
+import { supabase } from "../utils/supabaseClient";
+import { uploadFileToFolder } from "../utils/uploadFile";
 
 const RegisterPage: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const router = useRouter();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [renterId, setRenterId] = useState<number | null>(null); // Armazena o idRenter
+  const [formData, setFormData] = useState<Renter>({
+    idRenter: 0,
     nameRenter: "",
     emailRenter: "",
     phoneRenter: "",
@@ -13,379 +20,398 @@ const RegisterPage: React.FC = () => {
     city: "",
     state: "",
     zipcode: "",
-    cpfRenter: "",
-    idtRenter: "",
+    cpfRenter: BigInt(0),
+    idtRenter: BigInt(0),
     idtSenderRenter: "",
     maritalStatusRenter: "",
-    birthdateRenter: "",
+    birthdateRenter: new Date(),
     ciaWorksRenter: "",
-    admissionDataRenter: "",
-    salaryRenter: "",
-    idUnitIntended: "",
+    admissionDataRenter: new Date(),
+    salaryRenter: 0,
+    idUnitIntended: 0,
     bankAccount: "",
     paymentMethod: "",
-    creditScore: "",
+    creditScore: 0,
     preferredContactMethod: "",
     newsletterSubscribed: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    lastLogin: new Date(),
+    documentURL: [],
     emergencyContactName: "",
     emergencyContactRelationship: "",
     emergencyContactPhone: "",
-    documents: { identity: null, payslip: null, proofOfAddress: null },
   });
 
+  // Obtém a sessão e verifica se o usuário está autenticado
+  useEffect(() => {
+    const getSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+      } else if (renterId) {
+        loadRenterData(renterId); // Carrega os dados se o idRenter estiver disponível
+      }
+    };
+    getSession();
+  }, [router, renterId]);
+
+  // Carregar dados do locatário existente (caso já tenha sido salvo antes)
+  const loadRenterData = async (idRenter: number) => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("Renter")
+      .select("*")
+      .eq("idRenter", idRenter)
+      .single();
+    if (error) {
+      console.error("Erro ao carregar os dados:", error.message);
+    } else {
+      setFormData(data as Renter);
+    }
+    setLoading(false);
+  };
+
+  // Salvar dados parciais (após cada etapa)
+  const saveData = async () => {
+    setLoading(true);
+    try {
+      const { idRenter, ...renterData } = formData;
+
+      const { data, error } = renterId
+        ? await supabase
+            .from("Renter")
+            .update(renterData)
+            .eq("idRenter", renterId)
+        : await supabase.from("Renter").insert(renterData).select();
+
+      if (error) throw error;
+
+      if (!renterId && data) {
+        setRenterId(data[0].idRenter); // Salva o idRenter após a primeira inserção
+      }
+    } catch (error: any) {
+      console.error("Erro ao salvar os dados:", error.message);
+    }
+    setLoading(false);
+  };
+
+  // Função para tratar mudanças nos inputs
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
 
-    if (type === "checkbox") {
-      setFormData({
-        ...formData,
-        [name]: (e.target as HTMLInputElement).checked,
-      });
-    } else {
-      setFormData({ ...formData, [name]: value });
+  // Upload de arquivos
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fileType: string
+  ) => {
+    const file = e.target.files?.[0];
+    if (file && renterId) {
+      const folder = `renter_${renterId}`; // Cria pasta com base no idRenter
+      const publicUrl = await uploadFileToFolder(file, folder);
+      if (publicUrl) {
+        setFormData((prevData) => ({
+          ...prevData,
+          documentURL: [...(prevData.documentURL || []), publicUrl],
+        }));
+      }
     }
   };
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name } = e.target;
-    if (e.target.files) {
-      setFormData({
-        ...formData,
-        documents: { ...formData.documents, [name]: e.target.files[0] },
-      });
-    }
+
+  const nextStep = async () => {
+    await saveData();
+    setCurrentStep((prevStep) => prevStep + 1);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(formData);
+  const prevStep = () => {
+    setCurrentStep((prevStep) => prevStep - 1);
   };
 
-  return (
-    <div className="container mx-auto">
-      <div className="w-full">
-        <div className="max-w-[1024px] mx-auto">
-          <Header />
-        </div>
-      </div>
+  const handleSubmit = async () => {
+    await saveData();
+    alert("Cadastro concluído com sucesso!");
+    router.push("/");
+  };
 
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-lg mx-auto p-4 bg-white shadow-md rounded-md"
-      >
-        <h2 className="text-2xl font-bold mb-6">Informações do Locatário</h2>
-
-        {/* Nome Completo */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Nome Completo</label>
-          <input
-            type="text"
-            name="nameRenter"
-            value={formData.nameRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Email */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Email</label>
-          <input
-            type="email"
-            name="emailRenter"
-            value={formData.emailRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Telefone */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Telefone</label>
-          <input
-            type="tel"
-            name="phoneRenter"
-            value={formData.phoneRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Endereço */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Endereço</label>
-          <input
-            type="text"
-            name="addressRenter"
-            value={formData.addressRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Número, Bairro, Cidade, Estado, CEP */}
-        <div className="grid grid-cols-2 gap-4">
+  // Renderiza o formulário completo com todos os campos de cada etapa
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
           <div>
+            <h2 className="text-xl font-bold mb-4">Dados Gerais</h2>
+            <label className="block text-gray-700">Nome completo</label>
+            <input
+              type="text"
+              name="nameRenter"
+              value={formData.nameRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+            <label className="block text-gray-700">Data de Nascimento</label>
+            <input
+              type="date"
+              name="birthdateRenter"
+              value={formData.birthdateRenter.toString()}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+            <label className="block text-gray-700">Estado Civil</label>
+            <select
+              name="maritalStatusRenter"
+              value={formData.maritalStatusRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="">Selecione</option>
+              <option value="solteiro">Solteiro(a)</option>
+              <option value="casado">Casado(a)</option>
+              <option value="divorciado">Divorciado(a)</option>
+              <option value="viuvo">Viúvo(a)</option>
+              <option value="uniao_estavel">União Estável</option>
+            </select>
+            <label className="block text-gray-700">Identidade</label>
+            <input
+              type="text"
+              name="idtRenter"
+              value={formData.idtRenter.toString()}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+            <label className="block text-gray-700">Órgão Emissor</label>
+            <input
+              type="text"
+              name="idtSenderRenter"
+              value={formData.idtSenderRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+            <label className="block text-gray-700">CPF</label>
+            <input
+              type="text"
+              name="cpfRenter"
+              value={formData.cpfRenter.toString()}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Contatos</h2>
+            <label className="block text-gray-700">Telefone</label>
+            <input
+              type="text"
+              name="phoneRenter"
+              value={formData.phoneRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+            <label className="block text-gray-700">E-mail</label>
+            <input
+              type="email"
+              name="emailRenter"
+              value={formData.emailRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+            <label className="block text-gray-700">
+              Nome da Pessoa de Referência
+            </label>
+            <input
+              type="text"
+              name="emergencyContactName"
+              value={formData.emergencyContactName}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+            <label className="block text-gray-700">Grau de Parentesco</label>
+            <input
+              type="text"
+              name="emergencyContactRelationship"
+              value={formData.emergencyContactRelationship}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+            <label className="block text-gray-700">
+              Telefone da Pessoa de Referência
+            </label>
+            <input
+              type="text"
+              name="emergencyContactPhone"
+              value={formData.emergencyContactPhone}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+          </div>
+        );
+      case 3:
+        return (
+          <div>
+            <h2 className="text-xl font-bold mb-4">
+              Último Endereço de Residência
+            </h2>
+            <label className="block text-gray-700">Endereço</label>
+            <input
+              type="text"
+              name="addressRenter"
+              value={formData.addressRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
             <label className="block text-gray-700">Número</label>
             <input
               type="text"
               name="addressNumber"
               value={formData.addressNumber}
               onChange={handleChange}
-              className="mt-1 p-2 border w-full rounded"
+              className="w-full border rounded px-3 py-2"
               required
             />
-          </div>
-          <div>
             <label className="block text-gray-700">Bairro</label>
             <input
               type="text"
               name="neighborhood"
               value={formData.neighborhood}
               onChange={handleChange}
-              className="mt-1 p-2 border w-full rounded"
-              required
+              className="w-full border rounded px-3 py-2"
             />
-          </div>
-          <div>
             <label className="block text-gray-700">Cidade</label>
             <input
               type="text"
               name="city"
               value={formData.city}
               onChange={handleChange}
-              className="mt-1 p-2 border w-full rounded"
-              required
+              className="w-full border rounded px-3 py-2"
             />
-          </div>
-          <div>
             <label className="block text-gray-700">Estado</label>
             <input
               type="text"
               name="state"
               value={formData.state}
               onChange={handleChange}
-              className="mt-1 p-2 border w-full rounded"
-              required
+              className="w-full border rounded px-3 py-2"
             />
-          </div>
-          <div>
             <label className="block text-gray-700">CEP</label>
             <input
               type="text"
               name="zipcode"
               value={formData.zipcode}
               onChange={handleChange}
-              className="mt-1 p-2 border w-full rounded"
-              required
+              className="w-full border rounded px-3 py-2"
             />
           </div>
-        </div>
+        );
+      case 4:
+        return (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Dados Profissionais</h2>
+            <label className="block text-gray-700">Empresa onde trabalha</label>
+            <input
+              type="text"
+              name="ciaWorksRenter"
+              value={formData.ciaWorksRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+            <label className="block text-gray-700">Data de Admissão</label>
+            <input
+              type="date"
+              name="admissionDataRenter"
+              value={formData.admissionDataRenter.toString()}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+            <label className="block text-gray-700">Salário</label>
+            <input
+              type="number"
+              step="0.01"
+              name="salaryRenter"
+              value={formData.salaryRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+        );
+      case 5:
+        return (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Upload de Documentos</h2>
+            <label className="block text-gray-700">Foto da Identidade</label>
+            <input
+              type="file"
+              onChange={(e) => handleFileUpload(e, "identity")}
+            />
+            <label className="block text-gray-700">
+              Foto do Comprovante de Residência
+            </label>
+            <input
+              type="file"
+              onChange={(e) => handleFileUpload(e, "residenceProof")}
+            />
+            <label className="block text-gray-700">Foto do Contracheque</label>
+            <input
+              type="file"
+              onChange={(e) => handleFileUpload(e, "payStub")}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
-        {/* CPF */}
-        <div className="mb-4">
-          <label className="block text-gray-700">CPF</label>
-          <input
-            type="text"
-            name="cpfRenter"
-            value={formData.cpfRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Identidade */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Identidade (RG)</label>
-          <input
-            type="text"
-            name="idtRenter"
-            value={formData.idtRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Órgão Emissor */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Órgão Emissor</label>
-          <input
-            type="text"
-            name="idtSenderRenter"
-            value={formData.idtSenderRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Estado Civil */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Estado Civil</label>
-          <select
-            name="maritalStatusRenter"
-            value={formData.maritalStatusRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
+  return (
+    <div className="max-w-2xl mx-auto py-10">
+      <h1 className="text-2xl font-bold mb-6">Cadastro de Locatário</h1>
+      {loading ? <p>Carregando...</p> : renderStep()}
+      <div className="flex justify-between mt-4">
+        {currentStep > 1 && (
+          <button
+            type="button"
+            onClick={prevStep}
+            className="bg-gray-500 text-white px-4 py-2 rounded"
           >
-            <option value="">Selecione</option>
-            <option value="solteiro">Solteiro(a)</option>
-            <option value="casado">Casado(a)</option>
-            <option value="divorciado">Divorciado(a)</option>
-            <option value="divorciado">Viúvo(a)</option>
-          </select>
-        </div>
-
-        {/* Data de Nascimento */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Data de Nascimento</label>
-          <input
-            type="date"
-            name="birthdateRenter"
-            value={formData.birthdateRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Empresa e Data de Admissão */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Empresa onde trabalha</label>
-          <input
-            type="text"
-            name="ciaWorksRenter"
-            value={formData.ciaWorksRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Data de Admissão</label>
-          <input
-            type="date"
-            name="admissionDataRenter"
-            value={formData.admissionDataRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Salário */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Salário</label>
-          <input
-            type="number"
-            name="salaryRenter"
-            value={formData.salaryRenter}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Contato de Emergência */}
-        <div className="mb-4">
-          <label className="block text-gray-700">
-            Nome do Contato de Emergência
-          </label>
-          <input
-            type="text"
-            name="emergencyContactName"
-            value={formData.emergencyContactName}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700">
-            Relacionamento com Contato de Emergência
-          </label>
-          <input
-            type="text"
-            name="emergencyContactRelationship"
-            value={formData.emergencyContactRelationship}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700">
-            Telefone do Contato de Emergência
-          </label>
-          <input
-            type="tel"
-            name="emergencyContactPhone"
-            value={formData.emergencyContactPhone}
-            onChange={handleChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Upload de Documentos */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Identidade (Upload)</label>
-          <input
-            type="file"
-            name="identity"
-            accept=".png,.jpg,.jpeg,.pdf"
-            onChange={handleFileChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700">Contracheque</label>
-          <input
-            type="file"
-            name="payslip"
-            accept=".png,.jpg,.jpeg,.pdf"
-            onChange={handleFileChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700">
-            Comprovante de Residência
-          </label>
-          <input
-            type="file"
-            name="proofOfAddress"
-            accept=".png,.jpg,.jpeg,.pdf"
-            onChange={handleFileChange}
-            className="mt-1 p-2 border w-full rounded"
-            required
-          />
-        </div>
-
-        {/* Botão de Enviar */}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Enviar Cadastro
-        </button>
-      </form>
+            Anterior
+          </button>
+        )}
+        {currentStep < 5 && (
+          <button
+            type="button"
+            onClick={nextStep}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Próximo
+          </button>
+        )}
+        {currentStep === 5 && (
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Concluir Cadastro
+          </button>
+        )}
+      </div>
     </div>
   );
 };
