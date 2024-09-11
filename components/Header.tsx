@@ -143,6 +143,15 @@ const Header: React.FC = () => {
                 Contato
               </Link>
             </li>
+
+            <li className="mx-2">
+              <Link
+                href="/register"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Cadastro
+              </Link>
+            </li>
             <li className="mx-2">
               <Link
                 href="/"

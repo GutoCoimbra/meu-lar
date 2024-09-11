@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { Renter } from "../types";
 import { supabase } from "../utils/supabaseClient";
 import { uploadFileToFolder } from "../utils/uploadFile";
+import Header from "@/components/Header";
 
 const RegisterPage: React.FC = () => {
   const router = useRouter();
@@ -394,7 +395,12 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10">
+    <div className="max-w-2xl mx-auto ">
+      <div className="w-full">
+        <div className="max-w-[1024px] mx-auto">
+          <Header />
+        </div>
+      </div>
       <h1 className="text-2xl font-bold mb-6">Cadastro de Locatário</h1>
       {loading ? <p>Carregando...</p> : renderStep()}
       <div className="flex justify-between mt-4">
