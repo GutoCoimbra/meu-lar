@@ -74,7 +74,7 @@ export interface Renter {
   ciaWorksRenter: string; // Empresa onde o locatário trabalha
   admissionDataRenter: Date; // Data de admissão na empresa
   salaryRenter: number; // Salário do locatário
-  idUnitIntended: number; // Unidade pretendida para locação
+  //idUnitIntended: number; // Unidade pretendida para locação
   bankAccount: string; // Conta bancária do locatário
   paymentMethod: string; // Método preferido de pagamento
   creditScore: number; // Pontuação de crédito do locatário

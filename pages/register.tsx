@@ -28,7 +28,7 @@ const RegisterPage: React.FC = () => {
     ciaWorksRenter: "",
     admissionDataRenter: new Date(),
     salaryRenter: 0,
-    idUnitIntended: 0,
+    //idUnitIntended: 0,
     bankAccount: "",
     paymentMethod: "",
     creditScore: 0,
