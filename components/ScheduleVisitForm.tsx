@@ -4,10 +4,10 @@ import { supabase } from "../utils/supabaseClient";
 
 interface ScheduleVisitFormProps {
   unit_id: string;
-  initialDate?: string; // Data inicial opcional
-  visitId?: string; // ID da visita existente, se houver
-  onClose: () => void; // Função para fechar o modal
-  onUpdate: () => void; // Função para acionar a atualização na página `my-visits`
+  visitId?: string;
+  initialDate?: string;
+  onClose: () => void;
+  onUpdate?: () => void; // Adicionando o onUpdate como opcional
 }
 
 const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
@@ -97,7 +97,11 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
       }
 
       onClose(); // Fecha o modal após o sucesso
-      onUpdate(); // Chama a função de atualização na página `my-visits`
+
+      // Verifica se a função onUpdate foi passada antes de chamá-la
+      if (onUpdate) {
+        onUpdate(); // Chama a função de atualização na página `my-visits`
+      }
     } catch (error) {
       console.error("Erro ao agendar/atualizar visita:", error);
     }
