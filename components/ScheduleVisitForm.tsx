@@ -4,14 +4,18 @@ import { supabase } from "../utils/supabaseClient";
 
 interface ScheduleVisitFormProps {
   unit_id: string;
-  initialDate?: string; // Agora aceita a data inicial opcional
+  initialDate?: string; // Data inicial opcional
+  visitId?: string; // ID da visita existente, se houver
   onClose: () => void; // Função para fechar o modal
+  onUpdate: () => void; // Função para acionar a atualização na página `my-visits`
 }
 
 const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
   unit_id,
-  initialDate = "", // Usa a data inicial se fornecida, caso contrário, inicia com uma string vazia
+  initialDate = "",
+  visitId, // Recebe o ID da visita se estiver disponível
   onClose,
+  onUpdate, // Função para acionar a atualização
 }) => {
   const [visitDate, setVisitDate] = useState(initialDate); // Inicia com a data passada ou uma string vazia
   const [phone, setPhone] = useState(""); // Estado para o telefone
@@ -24,12 +28,11 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
       if (user) {
         const userId = user.id; // Pega o ID do usuário da sessão
 
-        // Faz uma consulta para obter o telefone do usuário
         const { data: userData, error } = await supabase
           .from("User")
           .select("phone")
           .eq("uuidgoogle", userId)
-          .single(); // Garante que trará apenas um resultado
+          .single();
 
         if (error) {
           console.error("Erro ao buscar telefone:", error);
@@ -40,7 +43,7 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
     };
 
     fetchPhone();
-  }, [user]); // Executa o efeito quando o usuário estiver disponível
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,24 +66,40 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
         throw userUpdateError;
       }
 
-      // Insere o agendamento no Supabase
-      const { data, error } = await supabase.from("visitSchedules").insert([
-        {
-          uuidgoogle: userId, // Usar o ID do usuário
-          unit_id: unit_id,
-          visit_date: visitDate,
-          status_visit: "pendente", // Status inicial
-        },
-      ]);
+      // Se houver um visitId, fazemos uma atualização
+      if (visitId) {
+        const { error } = await supabase
+          .from("visitSchedules")
+          .update({
+            visit_date: visitDate,
+          })
+          .eq("idVisit", visitId);
 
-      if (error) {
-        throw error;
+        if (error) {
+          throw error;
+        }
+        alert("Visita atualizada com sucesso!");
+      } else {
+        // Se não houver visitId, cria uma nova visita
+        const { error } = await supabase.from("visitSchedules").insert([
+          {
+            uuidgoogle: userId,
+            unit_id: unit_id,
+            visit_date: visitDate,
+            status_visit: "pendente",
+          },
+        ]);
+
+        if (error) {
+          throw error;
+        }
+        alert("Visita agendada com sucesso!");
       }
 
-      alert("Visita agendada com sucesso!");
       onClose(); // Fecha o modal após o sucesso
+      onUpdate(); // Chama a função de atualização na página `my-visits`
     } catch (error) {
-      console.error("Erro ao agendar visita:", error);
+      console.error("Erro ao agendar/atualizar visita:", error);
     }
   };
 
@@ -92,12 +111,14 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
       >
         ✕
       </button>
-      <h2 className="text-lg font-bold mb-4">Agendar Visita</h2>
+      <h2 className="text-lg font-bold mb-4">
+        {visitId ? "Alterar Visita" : "Agendar Visita"}
+      </h2>
       <form onSubmit={handleSubmit}>
         <label className="block mb-2">
           Data da Visita:
           <input
-            type="datetime-local" // Tipo ajustado para incluir hora
+            type="datetime-local"
             value={visitDate}
             onChange={(e) => setVisitDate(e.target.value)}
             required
@@ -118,7 +139,7 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
         </label>
 
         <button type="submit" className="btn w-full mt-4">
-          Agendar Visita
+          {visitId ? "Alterar Visita" : "Agendar Visita"}
         </button>
       </form>
     </div>

@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { supabase } from "../utils/supabaseClient";
 import Header from "@/components/Header";
-import Card from "@/components/Card"; // Importar o componente de card
-import ScheduleVisitForm from "@/components/ScheduleVisitForm"; // Importar o formulário de agendamento
-import Link from "next/link"; // Para o link de visitas realizadas
+import Card from "@/components/Card";
+import ScheduleVisitForm from "@/components/ScheduleVisitForm";
+import Link from "next/link";
 
 interface Visit {
   idVisit: string;
@@ -17,44 +17,44 @@ const MyVisits = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [units, setUnits] = useState<any[]>([]);
   const [types, setTypes] = useState<{ [key: number]: string }>({});
-  const [showCancelPopup, setShowCancelPopup] = useState<Visit | null>(null); // Estado para controlar o pop-up de cancelamento
-  const [showEditForm, setShowEditForm] = useState<Visit | null>(null); // Estado para controlar o formulário de edição
-  const [isLoading, setIsLoading] = useState(false); // Controle de loading ao cancelar a visita
+  const [showCancelPopup, setShowCancelPopup] = useState<Visit | null>(null);
+  const [showEditForm, setShowEditForm] = useState<Visit | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { data: session, status } = useSession();
 
+  const fetchVisits = async () => {
+    if (status === "unauthenticated") {
+      return alert("Você precisa estar logado para ver seus agendamentos.");
+    }
+
+    if (!session?.user) {
+      return;
+    }
+
+    const userId = session.user.id;
+
+    const { data: visitData, error: visitError } = await supabase
+      .from("visitSchedules")
+      .select("idVisit, visit_date, unit_id, status_visit")
+      .eq("uuidgoogle", userId)
+      .eq("status_visit", "pendente"); // Filtrar apenas visitas com status "pendente"
+
+    if (visitError) {
+      console.error("Erro ao buscar visitas:", visitError.message);
+    } else {
+      setVisits(visitData as Visit[]);
+
+      const unitIds = visitData.map((visit) => visit.unit_id);
+      const unitsData = await fetchUnits(unitIds);
+      setUnits(unitsData);
+
+      const typesData = await fetchUnitTypes();
+      setTypes(typesData);
+    }
+  };
+
   useEffect(() => {
-    const fetchVisits = async () => {
-      if (status === "unauthenticated") {
-        return alert("Você precisa estar logado para ver seus agendamentos.");
-      }
-
-      if (!session?.user) {
-        return;
-      }
-
-      const userId = session.user.id;
-
-      const { data: visitData, error: visitError } = await supabase
-        .from("visitSchedules")
-        .select("idVisit, visit_date, unit_id, status_visit")
-        .eq("uuidgoogle", userId)
-        .eq("status_visit", "pendente"); // Filtrar apenas visitas com status "pendente"
-
-      if (visitError) {
-        console.error("Erro ao buscar visitas:", visitError.message);
-      } else {
-        setVisits(visitData as Visit[]);
-
-        const unitIds = visitData.map((visit) => visit.unit_id);
-        const unitsData = await fetchUnits(unitIds);
-        setUnits(unitsData);
-
-        const typesData = await fetchUnitTypes();
-        setTypes(typesData);
-      }
-    };
-
-    fetchVisits();
+    fetchVisits(); // Recarregar as visitas
   }, [session, status]);
 
   const fetchUnits = async (unitIds: string[]) => {
@@ -106,21 +106,19 @@ const MyVisits = () => {
     if (showCancelPopup) {
       setIsLoading(true); // Ativa o loading
 
-      // Atualiza o status da visita para "cancelado"
       const { error } = await supabase
         .from("visitSchedules")
         .update({ status_visit: "cancelado" })
         .eq("idVisit", showCancelPopup.idVisit);
 
       if (!error) {
-        // Atualiza a lista de visitas para remover a visita cancelada
         setVisits(visits.filter((v) => v.idVisit !== showCancelPopup.idVisit));
       } else {
         console.error("Erro ao cancelar visita:", error.message);
       }
 
-      setIsLoading(false); // Desativa o loading
-      setShowCancelPopup(null); // Fecha o pop-up
+      setIsLoading(false);
+      setShowCancelPopup(null);
     }
   };
 
@@ -132,7 +130,6 @@ const MyVisits = () => {
     <div>
       <Header />
 
-      {/* Link para visitas realizadas */}
       <div className="text-left mb-4">
         <Link href="/my-visits-realized">Visitas Realizadas</Link>
       </div>
@@ -181,7 +178,6 @@ const MyVisits = () => {
         })
       )}
 
-      {/* Pop-up de Confirmação de Cancelamento */}
       {showCancelPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg">
@@ -207,13 +203,14 @@ const MyVisits = () => {
         </div>
       )}
 
-      {/* Formulário de Edição */}
       {showEditForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <ScheduleVisitForm
             unit_id={showEditForm.unit_id}
-            initialDate={showEditForm.visit_date} // Passa a data inicial da visita
-            onClose={() => setShowEditForm(null)} // Fecha o formulário
+            visitId={showEditForm.idVisit} // Passa o ID da visita para ser editada
+            initialDate={showEditForm.visit_date}
+            onClose={() => setShowEditForm(null)}
+            onUpdate={fetchVisits} // Atualiza a página quando o formulário fechar
           />
         </div>
       )}
