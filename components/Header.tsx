@@ -43,7 +43,57 @@ const Header: React.FC = () => {
             />
           </svg>
         </button>
-
+        {/* Menu Links */}
+        <div
+          className={`w-full mt-4 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 ${
+            isOpen ? "block" : "hidden"
+          }`}
+          id="navbar-hamburger"
+        >
+          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium ">
+            <li className="mx-2">
+              <Link
+                href="/"
+                className="block py-2 px-3 text-white bg-blue-700 rounded dark:bg-blue-600"
+                aria-current="page"
+              >
+                Início
+              </Link>
+            </li>
+            <li className="mx-2">
+              <Link
+                href="/"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Unidades
+              </Link>
+            </li>
+            <li className="mx-2">
+              <Link
+                href="/"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                O que preciso?
+              </Link>
+            </li>
+            <li className="mx-2">
+              <Link
+                href="/"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Contato
+              </Link>
+            </li>
+            <li className="mx-2">
+              <Link
+                href="/"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Admin
+              </Link>
+            </li>
+          </ul>
+        </div>
         {/* Logo e Ações de Autenticação */}
         <Link
           href="/"
@@ -99,57 +149,6 @@ const Header: React.FC = () => {
               Entrar
             </button>
           )}
-          {/* Menu Links */}
-          <div
-            className={`w-full mt-4 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 ${
-              isOpen ? "block" : "hidden"
-            }`}
-            id="navbar-hamburger"
-          >
-            <ul className="flex flex-col md:flex-row md:space-x-4 font-medium ">
-              <li className="mx-2">
-                <Link
-                  href="/"
-                  className="block py-2 px-3 text-white bg-blue-700 rounded dark:bg-blue-600"
-                  aria-current="page"
-                >
-                  Início
-                </Link>
-              </li>
-              <li className="mx-2">
-                <Link
-                  href="/"
-                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  Unidades
-                </Link>
-              </li>
-              <li className="mx-2">
-                <Link
-                  href="/"
-                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  O que preciso?
-                </Link>
-              </li>
-              <li className="mx-2">
-                <Link
-                  href="/"
-                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  Contato
-                </Link>
-              </li>
-              <li className="mx-2">
-                <Link
-                  href="/"
-                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  Admin
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
     </nav>
