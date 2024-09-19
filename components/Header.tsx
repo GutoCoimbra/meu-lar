@@ -71,7 +71,6 @@ const Header: React.FC = () => {
                   Bem-vindo, {session.user?.name}!
                 </span>
               )}
-
               {isProfileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2">
                   <Link
@@ -81,7 +80,7 @@ const Header: React.FC = () => {
                     Meus Dados
                   </Link>
                   <Link
-                    href="/meus-dados"
+                    href="/favorites"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Meus Favoritos
@@ -96,71 +95,10 @@ const Header: React.FC = () => {
               )}
             </>
           ) : (
-            <button onClick={() => signIn()} className="btn">
+            <button onClick={() => signIn("google")} className="btn">
               Entrar
             </button>
           )}
-        </div>
-
-        {/* Menu Links */}
-        <div
-          className={`w-full mt-4 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 ${
-            isOpen ? "block" : "hidden"
-          }`}
-          id="navbar-hamburger"
-        >
-          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium ">
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-white bg-blue-700 rounded dark:bg-blue-600"
-                aria-current="page"
-              >
-                Início
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Unidades
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                O que preciso?
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Contato
-              </Link>
-            </li>
-
-            <li className="mx-2">
-              <Link
-                href="/register"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Cadastro
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Admin
-              </Link>
-            </li>
-          </ul>
         </div>
       </div>
     </nav>

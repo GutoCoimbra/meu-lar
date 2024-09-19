@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import Slider from "react-slick";
 import { ArrowPrev, ArrowNext } from "./Arrow";
 import { Unit } from "@/types"; // Importando a interface Unit do arquivo types.ts
+import { supabase } from "../utils/supabaseClient"; // Supabase client
+import { useSession } from "next-auth/react"; // Autenticação
 
 interface CardProps {
   unit: Unit | null;
@@ -14,6 +16,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
   const prevImgUrlRef = useRef<string | string[] | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0); // Estado para acompanhar o slide atual
+  const { data: session } = useSession(); // Sessão do usuário logado
 
   if (!unit) {
     return null;
@@ -61,6 +64,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
   const totalValue =
     rentValue + condominium + waterTax + electricityTax + internetTax;
 
+  // Configurações do carrossel
   const settings = {
     dots: true,
     infinite: true,
@@ -90,13 +94,60 @@ const Card: React.FC<CardProps> = React.memo(({ unit }) => {
     ),
   };
 
-  const handleClick = () => {
-    router.push(`property/${idUnit}`);
+  // Função para verificar se o imóvel já está favoritado
+  useEffect(() => {
+    const checkFavorite = async () => {
+      if (session?.user?.id) {
+        const { data, error } = await supabase
+          .from("favorite")
+          .select("idfavorite")
+          .eq("uuidgoogle", session.user.id) // `uuidgoogle` do usuário logado
+          .eq("idunit", idUnit);
+
+        if (data && data.length > 0) {
+          setIsFavorited(true); // Se o favorito já existe, marca como favoritado
+        } else {
+          setIsFavorited(false);
+        }
+      }
+    };
+
+    checkFavorite();
+  }, [session, idUnit]);
+
+  // Função para alternar o estado de favorito
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!session?.user?.id) return; // Verifica se o usuário está logado
+
+    if (isFavorited) {
+      // Remover dos favoritos
+      const { error } = await supabase
+        .from("favorite")
+        .delete()
+        .eq("uuidgoogle", session.user.id)
+        .eq("idunit", idUnit);
+
+      if (!error) {
+        setIsFavorited(false); // Atualiza o estado de favorito
+      }
+    } else {
+      // Adicionar aos favoritos
+      const { error } = await supabase.from("favorite").insert({
+        uuidgoogle: session.user.id, // `uuidgoogle` do usuário logado
+        idunit: idUnit,
+        createdat: new Date(), // Data do favorito
+      });
+
+      if (!error) {
+        setIsFavorited(true); // Atualiza o estado de favorito
+      }
+    }
   };
 
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsFavorited(!isFavorited);
+  const handleClick = () => {
+    router.push(`property/${idUnit}`);
   };
 
   return (

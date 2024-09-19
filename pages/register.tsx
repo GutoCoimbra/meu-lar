@@ -13,6 +13,7 @@ const RegisterPage: React.FC = () => {
   const [renterId, setRenterId] = useState<number | null>(null); // Armazena o idRenter
   const [formData, setFormData] = useState<Renter>({
     idRenter: 0,
+    uuid: "",
     nameRenter: "",
     emailRenter: "",
     phoneRenter: "",
@@ -49,12 +50,20 @@ const RegisterPage: React.FC = () => {
   const { data: session, status } = useSession();
 
   useEffect(() => {
+    if (status === "loading") return;
+
     if (status === "unauthenticated") {
-      router.push("/auth/signin"); // Redireciona para a página de login NextAuth se não estiver logado
-    } else if (renterId) {
-      loadRenterData(renterId); // Carrega os dados se o idRenter estiver disponível
+      router.push("/register"); // Redireciona para a página de login NextAuth se não estiver logado
+    } else if (session && session.user?.email) {
+      console.log("Dados da sessão:", session);
+      // Preenche o email e o UUID automaticamente
+      setFormData((prevData) => ({
+        ...prevData,
+        emailRenter: session.user.email || "",
+        uuid: session.user.id || "",
+      }));
     }
-  }, [status, renterId, router]);
+  }, [status, session, router]);
 
   // Carregar dados do locatário existente (caso já tenha sido salvo antes)
   const loadRenterData = async (idRenter: number) => {
@@ -76,14 +85,29 @@ const RegisterPage: React.FC = () => {
   const saveData = async () => {
     setLoading(true);
     try {
-      const { idRenter, ...renterData } = formData;
+      // Sanitiza os dados antes de enviar para o Supabase
+      const sanitizedData = {
+        ...formData,
+        cpfRenter:
+          formData.cpfRenter.toString() === "" ? null : formData.cpfRenter,
+        idtRenter:
+          formData.idtRenter.toString() === "" ? null : formData.idtRenter,
+        salaryRenter:
+          formData.salaryRenter === 0 || isNaN(formData.salaryRenter)
+            ? null
+            : formData.salaryRenter,
+        idUnitIntended: isNaN(formData.idUnitIntended)
+          ? null
+          : formData.idUnitIntended,
+        // Adicione mais campos conforme necessário
+      };
 
       const { data, error } = renterId
         ? await supabase
             .from("Renter")
-            .update(renterData)
+            .update(sanitizedData)
             .eq("idRenter", renterId)
-        : await supabase.from("Renter").insert(renterData).select();
+        : await supabase.from("Renter").insert(sanitizedData).select();
 
       if (error) throw error;
 
@@ -102,10 +126,20 @@ const RegisterPage: React.FC = () => {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
 
-    // Se o campo for do tipo "date", converta a string para Date
-    if (e.target.type === "date") {
+    // Verifica se o campo é numérico e garante que valores vazios sejam tratados corretamente
+    if (
+      type === "number" ||
+      name === "cpfRenter" ||
+      name === "idtRenter" ||
+      name === "salaryRenter"
+    ) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value === "" ? null : Number(value), // Converte string vazia para `null` ou valor numérico
+      }));
+    } else if (type === "date") {
       setFormData((prevData) => ({ ...prevData, [name]: new Date(value) }));
     } else {
       setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -166,6 +200,16 @@ const RegisterPage: React.FC = () => {
               value={formData.nameRenter}
               onChange={handleChange}
               className="w-full border rounded px-3 py-2"
+              required
+            />
+            <label className="block text-gray-700">E-mail</label>
+            <input
+              type="email"
+              name="emailRenter"
+              value={formData.emailRenter}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              readOnly
               required
             />
             <label className="block text-gray-700">Data de Nascimento</label>
@@ -231,15 +275,7 @@ const RegisterPage: React.FC = () => {
               className="w-full border rounded px-3 py-2"
               required
             />
-            <label className="block text-gray-700">E-mail</label>
-            <input
-              type="email"
-              name="emailRenter"
-              value={formData.emailRenter}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-              required
-            />
+
             <label className="block text-gray-700">
               Nome da Pessoa de Referência
             </label>

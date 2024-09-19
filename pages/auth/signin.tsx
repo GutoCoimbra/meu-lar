@@ -13,11 +13,11 @@ export default function SignIn({ providers }: SignInProps) {
   const router = useRouter();
 
   // Verifica se o usuário já está autenticado e redireciona
-  // useEffect(() => {
-  //   if (session) {
-  //     router.push("/"); // Redireciona para a página inicial ou outra página desejada
-  //   }
-  // }, [session, router]);
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/"); // Redireciona para a página inicial ou outra página desejada
+    }
+  }, [session, router]);
 
   // Enquanto a sessão está carregando, pode exibir um indicador de carregamento
   if (status === "loading") {
@@ -35,7 +35,7 @@ export default function SignIn({ providers }: SignInProps) {
       {Object.values(providers).map((provider) => (
         <div key={provider.name}>
           <button
-            onClick={() => signIn(provider.id)}
+            onClick={() => signIn(provider.id, { callbackUrl: "/register" })}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             Entrar com {provider.name}

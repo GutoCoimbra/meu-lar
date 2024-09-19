@@ -57,6 +57,7 @@ export interface RentalHistory {
 // Definição dos tipos para a tabela Renter
 export interface Renter {
   idRenter: number; // Chave primária autoincrementável
+  uuid: string;
   nameRenter: string; // Nome do locatário
   emailRenter: string; // E-mail do locatário
   phoneRenter: string; // Telefone do locatário
