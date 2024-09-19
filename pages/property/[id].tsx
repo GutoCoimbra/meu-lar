@@ -1,62 +1,35 @@
-import React, { useState } from "react";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { useSession, signIn } from "next-auth/react";
 import Slider from "react-slick";
 import Image from "next/image";
+import { GetStaticProps, GetStaticPaths } from "next";
 import { ArrowPrev, ArrowNext } from "../../components/Arrow";
 import Header from "@/components/Header";
 import PropertyCosts from "@/components/PropertyCosts";
 import PropertyFeatures from "@/components/PropertyFeatures";
 import AvailableItems from "@/components/AvailableItems";
-import VisitButton from "@/components/VisitButton"; // Importação do VisitButton
+import VisitButton from "@/components/VisitButton";
+import ScheduleVisitForm from "../../components/ScheduleVisitForm";
 import { Unit } from "@/types";
 
 interface Props {
   unit: Unit | null;
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/units`);
-  const units = await res.json();
-  const paths = units.map((unit: Unit) => ({
-    params: { id: unit.idUnit.toString() },
-  }));
-  return { paths, fallback: "blocking" };
-};
-
-export const getStaticProps: GetStaticProps<Props> = async (context) => {
-  const id = context.params?.id as string;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-  const resUnit = await fetch(`${siteUrl}/api/units/${id}`);
-  const unit = await resUnit.json();
-
-  const resTypes = await fetch(`${siteUrl}/api/unitType`);
-  const types = await resTypes.json();
-
-  const typeMap = types.reduce(
-    (
-      acc: { [key: number]: string },
-      type: { idType: number; typeName: string }
-    ) => {
-      acc[type.idType] = type.typeName;
-      return acc;
-    },
-    {}
-  );
-
-  const unitWithTypeName = {
-    ...unit,
-    typeName: unit.typeId ? typeMap[unit.typeId] : "Tipo não especificado",
-  };
-
-  return {
-    props: { unit: unitWithTypeName },
-    revalidate: 60,
-  };
-};
-
 const PropertyPage = ({ unit }: Props) => {
-  const [currentSlide, setCurrentSlide] = useState(0); // Adicionar estado para controlar o slide ativo
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const handleVisitClick = () => {
+    if (status === "unauthenticated") {
+      signIn("google", { callbackUrl: router.asPath });
+    } else {
+      setIsModalOpen(true);
+    }
+  };
 
   if (!unit) return <div>Unidade não encontrada.</div>;
 
@@ -81,9 +54,9 @@ const PropertyPage = ({ unit }: Props) => {
     bathroom,
     floor,
     petAllowed,
+    averageRating,
     furnished,
     elevator,
-    averageRating = null,
     availableItems = [],
   } = unit;
 
@@ -112,7 +85,7 @@ const PropertyPage = ({ unit }: Props) => {
     prevArrow: <ArrowPrev />,
     nextArrow: <ArrowNext />,
     afterChange: (index: number) => {
-      setCurrentSlide(index); // Atualizar o slide atual quando o slide mudar
+      setCurrentSlide(index);
     },
     customPaging: (i: number) => (
       <div
@@ -158,9 +131,6 @@ const PropertyPage = ({ unit }: Props) => {
                 )
               )}
           </Slider>
-
-          {/* Adicionando o botão no canto inferior direito */}
-          <VisitButton className="absolute bottom-5 btnWhite" />
         </div>
 
         <div className="p-2">
@@ -194,23 +164,65 @@ const PropertyPage = ({ unit }: Props) => {
           <AvailableItems
             features={availableItems}
             accessInstructions="Use a chave digital"
-            averageRating={averageRating}
+            description={description}
+            averageRating={averageRating ?? null} // Se averageRating for undefined, passa null
             petAllowed={petAllowed}
             smokingAllowed={false}
-            description={description}
             furnished={furnished}
           />
 
           <div className="flex flex-col items-center justify-center">
-            <VisitButton className="btn mb-2" />
+            <VisitButton className="btn mb-2" onClick={handleVisitClick} />
             <button onClick={() => window.history.back()} className="btn mb03">
               Voltar
             </button>
           </div>
         </div>
       </div>
+
+      {/* Modal para o agendamento de visitas */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <ScheduleVisitForm
+            unit_id={idUnit.toString()}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
 
 export default PropertyPage;
+
+// getStaticPaths para gerar páginas estaticamente
+export const getStaticPaths: GetStaticPaths = async () => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/units`);
+  const units = await res.json();
+
+  const paths = units.map((unit: Unit) => ({
+    params: { id: unit.idUnit.toString() },
+  }));
+
+  return { paths, fallback: "blocking" };
+};
+
+// getStaticProps para buscar os dados da unidade
+export const getStaticProps: GetStaticProps<Props> = async (context) => {
+  const id = context.params?.id as string;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+  const resUnit = await fetch(`${siteUrl}/api/units/${id}`);
+  const unit = await resUnit.json();
+
+  if (!unit || Object.keys(unit).length === 0) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: { unit },
+    revalidate: 60, // Revalida a cada 60 segundos
+  };
+};
