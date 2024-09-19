@@ -31,6 +31,11 @@ const PropertyPage = ({ unit }: Props) => {
     }
   };
 
+  const handleUpdate = () => {
+    // Lógica para ser executada após a visita ser agendada ou alterada
+    console.log("Visita agendada/atualizada com sucesso.");
+  };
+
   if (!unit) return <div>Unidade não encontrada.</div>;
 
   const {
@@ -165,7 +170,7 @@ const PropertyPage = ({ unit }: Props) => {
             features={availableItems}
             accessInstructions="Use a chave digital"
             description={description}
-            averageRating={averageRating ?? null} // Se averageRating for undefined, passa null
+            averageRating={averageRating ?? null}
             petAllowed={petAllowed}
             smokingAllowed={false}
             furnished={furnished}
@@ -186,6 +191,7 @@ const PropertyPage = ({ unit }: Props) => {
           <ScheduleVisitForm
             unit_id={idUnit.toString()}
             onClose={() => setIsModalOpen(false)}
+            onUpdate={handleUpdate}
           />
         </div>
       )}
