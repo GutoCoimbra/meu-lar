@@ -70,3 +70,19 @@ header {
 .custom-dot-inactive {
   background-color: #9ca3af; /* Gray 400 */
 }
+
+/* Adicione este estilo ao popup */
+.popup-overlay {
+  position: fixed; /* Garante que o popup fique sobre toda a página */
+  inset: 0; /* Ocupa toda a tela */
+  background: rgba(
+    0,
+    0,
+    0,
+    0.5
+  ); /* Adiciona um fundo escuro com transparência */
+  z-index: 1000; /* Garante que o popup esteja acima de outros elementos */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
