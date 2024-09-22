@@ -7,9 +7,24 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    // Alterar para 'Unit' em vez de 'units'
-    const result = await query('SELECT * FROM "Unit" WHERE available = true');
+    // Realizar a consulta incluindo o UnitType
+    const result = await query(`
+      SELECT 
+        u.*, 
+        ut."typeName" 
+      FROM "Unit" u
+      JOIN "UnitType" ut ON u."typeId" = ut."idType"
+      WHERE u.available = true
+    `);
+
     const units = result.rows;
+
+    // Verifica se há unidades disponíveis
+    if (!units || units.length === 0) {
+      return res.status(404).json({ error: "Nenhuma unidade disponível" });
+    }
+
+    // Retorna os dados das unidades com o nome do tipo de unidade
     res.status(200).json(units);
   } catch (error) {
     console.error("Erro ao buscar unidades:", error);

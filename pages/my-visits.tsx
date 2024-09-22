@@ -37,7 +37,7 @@ const MyVisits = () => {
       .from("visitSchedules")
       .select("idVisit, visit_date, unit_id, status_visit")
       .eq("uuidgoogle", userId)
-      .eq("status_visit", "pendente"); // Filtrar apenas visitas com status "pendente"
+      .in("status_visit", ["pendente", "confirmada"]);
 
     if (visitError) {
       console.error("Erro ao buscar visitas:", visitError.message);
@@ -54,7 +54,7 @@ const MyVisits = () => {
   };
 
   useEffect(() => {
-    fetchVisits(); // Recarregar as visitas
+    fetchVisits();
   }, [session, status]);
 
   const fetchUnits = async (unitIds: string[]) => {
@@ -99,16 +99,16 @@ const MyVisits = () => {
   };
 
   const handleCancelClick = (visit: Visit) => {
-    setShowCancelPopup(visit); // Mostra o pop-up de confirmação
+    setShowCancelPopup(visit);
   };
 
   const handleConfirmCancel = async () => {
     if (showCancelPopup) {
-      setIsLoading(true); // Ativa o loading
+      setIsLoading(true);
 
       const { error } = await supabase
         .from("visitSchedules")
-        .update({ status_visit: "cancelado" })
+        .update({ status_visit: "cancelada" })
         .eq("idVisit", showCancelPopup.idVisit);
 
       if (!error) {
@@ -123,13 +123,16 @@ const MyVisits = () => {
   };
 
   const handleEditClick = (visit: Visit) => {
-    setShowEditForm(visit); // Abre o formulário de edição com os dados da visita
+    setShowEditForm(visit);
   };
 
   return (
     <div>
-      <Header />
-
+      <div className="w-full">
+        <div className="max-w-[1024px] mx-auto">
+          <Header />
+        </div>
+      </div>
       <div className="text-left mb-4">
         <Link href="/my-visits-realized">Visitas Realizadas</Link>
       </div>
@@ -207,10 +210,10 @@ const MyVisits = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <ScheduleVisitForm
             unit_id={showEditForm.unit_id}
-            visitId={showEditForm.idVisit} // Passa o ID da visita para ser editada
+            visitId={showEditForm.idVisit}
             initialDate={showEditForm.visit_date}
             onClose={() => setShowEditForm(null)}
-            onUpdate={fetchVisits} // Atualiza a página quando o formulário fechar
+            onUpdate={fetchVisits}
           />
         </div>
       )}

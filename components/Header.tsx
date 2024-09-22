@@ -16,13 +16,13 @@ const Header: React.FC = () => {
   };
 
   return (
-    <nav className="border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 w-full">
+    <nav className="relative z-50 bg-gray-50 dark:bg-gray-800 w-full">
       <div className="max-w-[1024px] w-full mx-auto flex flex-wrap items-center justify-between p-4">
         {/* Botão de Toggle para o Menu */}
         <button
           type="button"
           onClick={toggleMenu}
-          className="inline-flex items-center justify-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          className="inline-flex items-center justify-center p-2 w-10 h-10 text-xs text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
           aria-controls="navbar-hamburger"
           aria-expanded={isOpen}
         >
@@ -43,58 +43,8 @@ const Header: React.FC = () => {
             />
           </svg>
         </button>
-        {/* Menu Links */}
-        <div
-          className={`w-full mt-4 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 ${
-            isOpen ? "block" : "hidden"
-          }`}
-          id="navbar-hamburger"
-        >
-          <ul className="flex flex-col md:flex-row md:space-x-4 font-medium ">
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-white bg-blue-700 rounded dark:bg-blue-600"
-                aria-current="page"
-              >
-                Início
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Unidades
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                O que preciso?
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Contato
-              </Link>
-            </li>
-            <li className="mx-2">
-              <Link
-                href="/"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Admin
-              </Link>
-            </li>
-          </ul>
-        </div>
-        {/* Logo e Ações de Autenticação */}
+
+        {/* Logo */}
         <Link
           href="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
@@ -106,7 +56,7 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Ações de Login/Logout */}
-        <div className="relative flex items-center ml-4">
+        <div className="relative flex items-center ml-4 hidden md:flex">
           {session ? (
             <>
               {session.user?.image ? (
@@ -117,33 +67,33 @@ const Header: React.FC = () => {
                   className="w-8 h-8 rounded-full cursor-pointer"
                 />
               ) : (
-                <span className="text-sm text-white mr-4">
+                <span className="text-xs text-white mr-4">
                   Bem-vindo, {session.user?.name}!
                 </span>
               )}
               {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50">
                   <Link
                     href="/meus-dados"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-100"
                   >
                     Meus Dados
                   </Link>
                   <Link
                     href="/favorites"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-100"
                   >
                     Meus Favoritos
                   </Link>
                   <Link
                     href="/my-visits"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-100"
                   >
-                    Mihas visitas agendadas
+                    Minhas visitas agendadas
                   </Link>
                   <button
                     onClick={() => signOut()}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-gray-100"
                   >
                     Sair
                   </button>
@@ -157,6 +107,119 @@ const Header: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Menu lateral deslizante */}
+      <div
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-md transition-transform transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800">
+          <div className="flex items-center space-x-2">
+            <img src="/images/property.png" alt="Logo" className="h-6" />
+            <span className="text-xl text-white font-bold">MeuLar</span>
+          </div>
+          <button
+            onClick={toggleMenu}
+            className="text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Login/Logout no menu lateral para mobile */}
+        <div className="block md:hidden p-4 border-b border-gray-200">
+          {session ? (
+            <>
+              <div className="flex items-center space-x-3">
+                {session.user?.image && (
+                  <img
+                    src={session.user.image}
+                    alt="User profile"
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <span className="text-xs font-bold text-gray-700">
+                  {session.user?.name}
+                </span>
+              </div>
+
+              <div className="mt-2">
+                <Link
+                  href="/meus-dados"
+                  className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-100"
+                >
+                  Meus Dados
+                </Link>
+
+                <button
+                  onClick={() => signOut()}
+                  className="block w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-gray-100"
+                >
+                  Sair
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => signIn("google")}
+              className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100"
+            >
+              Entrar
+            </button>
+          )}
+        </div>
+
+        <ul className="space-y-4 p-4">
+          <li>
+            <Link
+              href="/favorites"
+              className="flex text-xs items-center text-gray-700"
+            >
+              Favoritos
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              href="/my-visits"
+              className="flex text-xs items-center text-gray-700"
+            >
+              Visitas agendadas
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              href="/contract"
+              className="flex text-xs items-center text-gray-700"
+            >
+              Contrato e boletos
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      {/* Background overlay quando o menu estiver aberto */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-50 z-30"
+          onClick={toggleMenu}
+        ></div>
+      )}
     </nav>
   );
 };

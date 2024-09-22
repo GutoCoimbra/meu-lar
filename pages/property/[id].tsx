@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Slider from "react-slick";
 import Image from "next/image";
 import { GetStaticProps, GetStaticPaths } from "next";
@@ -11,42 +11,130 @@ import PropertyFeatures from "@/components/PropertyFeatures";
 import AvailableItems from "@/components/AvailableItems";
 import VisitButton from "@/components/VisitButton";
 import ScheduleVisitForm from "../../components/ScheduleVisitForm";
+import { supabase } from "../../utils/supabaseClient";
 import { Unit } from "@/types";
 
 interface Props {
   unit: Unit | null;
 }
 
+interface Visit {
+  idVisit: string;
+  visit_date: string;
+  unit_id: string;
+  status_visit: string;
+}
+
+interface UnitType {
+  idType: number;
+  typeName: string;
+}
+
 const PropertyPage = ({ unit }: Props) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [existingVisit, setExistingVisit] = useState<Visit | null>(null);
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+  const [unitTypes, setUnitTypes] = useState<{ [key: number]: string }>({});
 
-  const handleVisitClick = () => {
-    if (status === "unauthenticated") {
-      signIn("google", { callbackUrl: router.asPath });
-    } else {
-      setIsModalOpen(true);
+  useEffect(() => {
+    setIsClient(true); // Após a montagem, indica que está no cliente
+  }, []);
+
+  const fetchScheduledVisit = async () => {
+    if (status === "authenticated" && session?.user) {
+      const { data: visitData, error: visitError } = await supabase
+        .from("visitSchedules")
+        .select("idVisit, visit_date, unit_id, status_visit")
+        .eq("uuidgoogle", session.user.id)
+        .eq("unit_id", unit?.idUnitUUID)
+        .in("status_visit", ["pendente", "confirmada"])
+        .limit(1);
+
+      if (visitError) {
+        console.error("Erro ao buscar visita agendada:", visitError.message);
+      } else if (visitData && visitData.length > 0) {
+        setExistingVisit(visitData[0]);
+      } else {
+        setExistingVisit(null);
+      }
     }
   };
 
-  const handleUpdate = () => {
-    // Lógica para ser executada após a visita ser agendada ou alterada
-    console.log("Visita agendada/atualizada com sucesso.");
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchScheduledVisit();
+    }
+  }, [status, session]);
+
+  const handleVisitClick = (visitId?: string) => {
+    setIsModalOpen(true);
   };
+
+  const handleUpdate = async (visitId?: string) => {
+    try {
+      const { error } = await supabase
+        .from("visitSchedules")
+        .update({ status_visit: "pendente" }) // Atualiza o status para pendente
+        .eq("idVisit", visitId);
+
+      if (error) {
+        console.error("Erro ao atualizar a visita:", error.message);
+      } else {
+        fetchScheduledVisit(); // Atualiza as visitas agendadas após a mudança
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar a visita:", error);
+    }
+    setIsModalOpen(false); // Fecha o modal após atualização
+  };
+
+  const fetchUnitTypes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("UnitType")
+        .select("idType, typeName");
+
+      if (error) {
+        console.error("Erro ao buscar tipos de unidade:", error.message);
+        return;
+      }
+
+      const unitTypeMap: { [key: number]: string } = {};
+      data.forEach((type: UnitType) => {
+        unitTypeMap[type.idType] = type.typeName;
+      });
+      setUnitTypes(unitTypeMap);
+    } catch (error) {
+      console.error("Erro ao buscar tipos de unidade:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnitTypes();
+  }, []);
 
   if (!unit) return <div>Unidade não encontrada.</div>;
 
+  const getTypeName = (typeId: number | undefined | null): string => {
+    if (typeof typeId === "number" && unitTypes[typeId]) {
+      return unitTypes[typeId];
+    }
+    return "Tipo não especificado";
+  };
+
+  const typeId = unit?.typeId ?? null;
+
   const {
-    idUnit,
+    idUnitUUID,
     imgUrl,
     address,
     neighborhood,
     city,
     state,
     unitNumber,
-    typeName,
     rentValue,
     description,
     condominium,
@@ -119,11 +207,13 @@ const PropertyPage = ({ unit }: Props) => {
             {Array.isArray(imgUrl) &&
               imgUrl.map((src, index) =>
                 src.endsWith(".mp4") ? (
-                  <div key={index}>
-                    <video controls className="w-full h-64 object-cover">
-                      <source src={src} type="video/mp4" />
-                    </video>
-                  </div>
+                  isClient && (
+                    <div key={index}>
+                      <video controls className="w-full h-64 object-cover">
+                        <source src={src} type="video/mp4" />
+                      </video>
+                    </div>
+                  )
                 ) : (
                   <div key={index} className="relative h-64 w-full">
                     <Image
@@ -143,7 +233,7 @@ const PropertyPage = ({ unit }: Props) => {
             {address}, {neighborhood} - {city}, {state}
           </h1>
           <p className="text-xs text-gray-700 mb-0 align-bottom">
-            {typeName ? typeName : "Tipo não especificado"} {unitNumber}
+            {getTypeName(typeId)} {unitNumber}
           </p>
 
           <PropertyCosts
@@ -177,19 +267,31 @@ const PropertyPage = ({ unit }: Props) => {
           />
 
           <div className="flex flex-col items-center justify-center">
-            <VisitButton className="btn mb-2" onClick={handleVisitClick} />
-            <button onClick={() => window.history.back()} className="btn mb03">
+            {existingVisit ? (
+              <button
+                className="btn mb-2"
+                onClick={() => handleVisitClick(existingVisit.idVisit)}
+              >
+                Alterar Visita
+              </button>
+            ) : (
+              <VisitButton
+                className="btn mb-2"
+                onClick={() => handleVisitClick()}
+              />
+            )}
+            <button onClick={() => window.history.back()} className="btn mb-3">
               Voltar
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal para o agendamento de visitas */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <ScheduleVisitForm
-            unit_id={idUnit.toString()}
+            unit_id={idUnitUUID.toString()}
+            visitId={existingVisit?.idVisit} // Certifique-se de que o ID da visita seja passado corretamente
             onClose={() => setIsModalOpen(false)}
             onUpdate={handleUpdate}
           />
@@ -207,7 +309,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const units = await res.json();
 
   const paths = units.map((unit: Unit) => ({
-    params: { id: unit.idUnit.toString() },
+    params: { id: unit.idUnitUUID.toString() },
   }));
 
   return { paths, fallback: "blocking" };

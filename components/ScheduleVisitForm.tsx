@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react"; // Usar next-auth para a sessão
+import { useSession } from "next-auth/react";
 import { supabase } from "../utils/supabaseClient";
 
 interface ScheduleVisitFormProps {
@@ -7,27 +7,25 @@ interface ScheduleVisitFormProps {
   visitId?: string;
   initialDate?: string;
   onClose: () => void;
-  onUpdate?: () => void; // Adicionando o onUpdate como opcional
+  onUpdate?: (visitId?: string) => void;
 }
 
 const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
   unit_id,
   initialDate = "",
-  visitId, // Recebe o ID da visita se estiver disponível
+  visitId,
   onClose,
-  onUpdate, // Função para acionar a atualização
+  onUpdate,
 }) => {
-  const [visitDate, setVisitDate] = useState(initialDate); // Inicia com a data passada ou uma string vazia
-  const [phone, setPhone] = useState(""); // Estado para o telefone
-  const { data: session } = useSession(); // Sessão do next-auth
+  const [visitDate, setVisitDate] = useState(initialDate);
+  const [phone, setPhone] = useState("");
+  const { data: session } = useSession();
   const user = session?.user;
 
-  // Efeito para buscar o telefone do usuário quando o componente for montado
   useEffect(() => {
     const fetchPhone = async () => {
       if (user) {
-        const userId = user.id; // Pega o ID do usuário da sessão
-
+        const userId = user.id;
         const { data: userData, error } = await supabase
           .from("User")
           .select("phone")
@@ -37,11 +35,10 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
         if (error) {
           console.error("Erro ao buscar telefone:", error);
         } else if (userData && userData.phone) {
-          setPhone(userData.phone); // Preenche o campo de telefone com o valor do banco
+          setPhone(userData.phone);
         }
       }
     };
-
     fetchPhone();
   }, [user]);
 
@@ -54,7 +51,7 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
     }
 
     try {
-      const userId = user.id; // ID do usuário
+      const userId = user.id;
 
       // Atualiza o telefone do usuário na tabela User
       const { error: userUpdateError } = await supabase
@@ -66,42 +63,49 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
         throw userUpdateError;
       }
 
-      // Se houver um visitId, fazemos uma atualização
+      // Verifica se estamos atualizando ou criando uma nova visita
       if (visitId) {
         const { error } = await supabase
           .from("visitSchedules")
           .update({
             visit_date: visitDate,
+            status_visit: "pendente",
           })
           .eq("idVisit", visitId);
 
         if (error) {
           throw error;
         }
-        alert("Visita atualizada com sucesso!");
+        alert("Visita alterada com sucesso.");
       } else {
-        // Se não houver visitId, cria uma nova visita
-        const { error } = await supabase.from("visitSchedules").insert([
-          {
-            uuidgoogle: userId,
-            unit_id: unit_id,
-            visit_date: visitDate,
-            status_visit: "pendente",
-          },
-        ]);
+        const { data, error } = await supabase
+          .from("visitSchedules")
+          .insert([
+            {
+              uuidgoogle: userId,
+              unit_id: unit_id,
+              visit_date: visitDate,
+              status_visit: "pendente",
+            },
+          ])
+          .select(); // Aqui adicionei o .select() para garantir que o retorno traga o novo id
 
         if (error) {
           throw error;
         }
+
+        // Verificar o que realmente está vindo no retorno
+
+        // Atualizar com o ID correto da resposta
+        if (data && data.length > 0 && onUpdate) {
+          const newVisitId = data[0].idVisit || data[0].id; // Ajustar de acordo com o campo correto retornado
+          onUpdate(newVisitId);
+        }
+
         alert("Visita agendada com sucesso!");
       }
 
-      onClose(); // Fecha o modal após o sucesso
-
-      // Verifica se a função onUpdate foi passada antes de chamá-la
-      if (onUpdate) {
-        onUpdate(); // Chama a função de atualização na página `my-visits`
-      }
+      onClose(); // Fecha o modal após a operação bem-sucedida
     } catch (error) {
       console.error("Erro ao agendar/atualizar visita:", error);
     }

@@ -8,7 +8,10 @@ import { useSession, signIn } from "next-auth/react"; // Autenticação
 
 interface CardProps {
   unit: Unit | null;
-  onFavoriteToggle?: (idUnit: string) => void; // Adicionando prop opcional
+  unitId?: string;
+  userId?: string | null;
+  onFavoriteToggle?: (idUnitUUID: string) => void;
+  onReviewSubmit?: () => void; // Adicionando a função onReviewSubmit
 }
 
 const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
@@ -26,13 +29,13 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
   }
 
   const {
-    idUnit,
+    idUnitUUID,
     address,
     neighborhood,
     city,
     state,
     unitNumber,
-    typeName,
+    typeName, // Agora recebemos `typeName` diretamente
     rentValue,
     condominium,
     waterTax,
@@ -104,11 +107,11 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
         const { data, error } = await supabase
           .from("favorite")
           .select("idfavorite")
-          .eq("uuidgoogle", session.user.id) // `uuidgoogle` do usuário logado
-          .eq("idunit", idUnit);
+          .eq("uuidgoogle", session.user.id)
+          .eq("idunit", idUnitUUID);
 
         if (data && data.length > 0) {
-          setIsFavorited(true); // Se o favorito já existe, marca como favoritado
+          setIsFavorited(true); // Atualiza o estado se o imóvel já for favorito
         } else {
           setIsFavorited(false);
         }
@@ -116,16 +119,13 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
     };
 
     checkFavorite();
-  }, [session, idUnit]);
+  }, [session, idUnitUUID]);
 
   // Função para alternar o estado de favorito
-  const toggleFavorite = async (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation(); // Previne a propagação se o evento for passado
-
-    if (!session?.user) {
-      // Se o usuário não estiver logado, mostra o pop-up de login
-      setShowLoginPopup(true);
-      setPendingFavorite(idUnit.toString()); // Armazena o imóvel para favoritar após o login
+  const toggleFavorite = async () => {
+    if (!session?.user?.id || !idUnitUUID) {
+      setShowLoginPopup(true); // Abre o popup de login se o usuário não estiver logado
+      setPendingFavorite(idUnitUUID.toString()); // Armazena o imóvel para favoritar após o login
       return;
     }
 
@@ -135,20 +135,17 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
         .from("favorite")
         .delete()
         .eq("uuidgoogle", session.user.id)
-        .eq("idunit", idUnit);
+        .eq("idunit", idUnitUUID);
 
       if (!error) {
         setIsFavorited(false); // Atualiza o estado de favorito
-        if (onFavoriteToggle) {
-          onFavoriteToggle(idUnit.toString()); // Converte para string
-        }
       }
     } else {
       // Adicionar aos favoritos
       const { error } = await supabase.from("favorite").insert({
-        uuidgoogle: session.user.id, // `uuidgoogle` do usuário logado
-        idunit: idUnit,
-        createdat: new Date(), // Data do favorito
+        uuidgoogle: session.user.id,
+        idunit: idUnitUUID,
+        createdat: new Date(),
       });
 
       if (!error) {
@@ -157,16 +154,16 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
     }
   };
 
-  // Aciona o favoritar após o login
+  // UseEffect para tratar o "pendingFavorite" após o login
   useEffect(() => {
-    if (pendingFavorite && status === "authenticated") {
+    if (pendingFavorite && status === "authenticated" && session?.user?.id) {
       toggleFavorite(); // Chama a função para favoritar após o login
-      setPendingFavorite(null); // Reseta o estado de pendente
+      setPendingFavorite(null); // Limpa o estado de favorito pendente
     }
   }, [session, status, pendingFavorite]);
 
   const handleClick = () => {
-    router.push(`property/${idUnit}`);
+    router.push(`property/${idUnitUUID}`);
   };
 
   return (
@@ -199,7 +196,10 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
             {typeName ? typeName : "Tipo não especificado"} {unitNumber}
           </p>
           <button
-            onClick={toggleFavorite}
+            onClick={(e) => {
+              e.stopPropagation(); // Isso evita que o clique no botão afete o card
+              toggleFavorite(); // Chama a função diretamente
+            }}
             className="focus:outline-none"
             aria-label="Favoritar"
           >

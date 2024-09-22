@@ -1,6 +1,6 @@
 // Definição dos tipos para a tabela Unit
 export interface Unit {
-  idUnit: number;
+  idUnitUUID: string;
   address: string;
   addressNumber: string;
   unitNumber: string;
@@ -47,7 +47,7 @@ export interface Unit {
 // Definição dos tipos para a tabela RentalHistory
 export interface RentalHistory {
   id: number; // Chave primária autoincrementável para a tabela RentalHistory
-  unitId: number; // Chave estrangeira que referencia a tabela Unit
+  idUnitUUID: string; // Chave estrangeira que referencia a tabela Unit
   tenantId: number; // ID do locatário
   startDate: Date; // Data de início da locação
   endDate: Date; // Data de término da locação
@@ -99,14 +99,14 @@ export interface Item {
 // Definição dos tipos para a tabela UnitItem
 export interface UnitItem {
   idUnitItem: number; // Chave primária autoincrementável para a tabela de junção
-  unitId: number; // Chave estrangeira que referencia a tabela Unit
+  idUnitUUID: string; // Chave estrangeira que referencia a tabela Unit
   itemId: number; // Chave estrangeira que referencia a tabela Item
 }
 
 // Definição dos tipos para a tabela RentalContract
 export interface RentalContract {
   idContract: number; // Chave primária autoincrementável
-  unitId: number; // Chave estrangeira que referencia a tabela Unit
+  idUnitUUID: string; // Chave estrangeira que referencia a tabela Unit
   renterId: number; // Chave estrangeira que referencia a tabela Renter
   startDate: Date; // Data de início do contrato
   endDate: Date; // Data de término do contrato
@@ -135,7 +135,7 @@ export interface Payment {
 // Definição dos tipos para a tabela MaintenanceRequest
 export interface MaintenanceRequest {
   idRequest: number; // Chave primária autoincrementável
-  unitId: number; // Chave estrangeira que referencia a tabela Unit
+  idUnitUUID: string; // Chave estrangeira que referencia a tabela Unit
   requestDate: Date; // Data do pedido de manutenção
   description: string; // Descrição do problema ou solicitação de manutenção
   status: string; // Status da solicitação
@@ -174,4 +174,12 @@ export interface Notification {
 export interface Feature {
   id: string;
   name: string;
+}
+
+export interface Visit {
+  idVisit: string;
+  visit_date: string;
+  idUnitUUID: string; // Alterado de unit_id para idUnitUUID
+  status_visit: string;
+  rejection_reason?: string; // Para armazenar o motivo da rejeição
 }

@@ -1,8 +1,5 @@
-
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { supabase } from "../../../utils/supabaseClient";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,7 +7,7 @@ export default async function handler(
 ) {
   const { id } = req.query;
 
-  // Verifica se o ID é fornecido e é um número
+  // Verifica se o ID é fornecido e é um número válido
   if (!id || Array.isArray(id) || isNaN(Number(id))) {
     return res.status(400).json({ message: "ID inválido" });
   }
@@ -18,21 +15,41 @@ export default async function handler(
   const numericId = Number(id);
 
   if (req.method === "GET") {
-    // Obter uma unidade específica
     try {
-      const unit = await prisma.unit.findUnique({
-        where: { idUnit: numericId },
-        include: {
-          unitType: true, // Incluir o tipo da unidade
-          features: true, // Incluir as features, se existir relacionamento
-        },
-      });
+      // Consulta a unidade
+      const { data: unit, error: unitError } = await supabase
+        .from("Unit")
+        .select("*")
+        .eq("idUnit", numericId)
+        .single();
 
-      if (!unit) {
-        return res.status(404).json({ message: "Unit not found" });
+      if (unitError || !unit) {
+        return res.status(404).json({ message: "Unidade não encontrada" });
       }
 
-      res.status(200).json(unit);
+      // Busca os tipos de unidade (UnitType) de forma separada
+      const { data: unitTypes, error: typeError } = await supabase
+        .from("UnitType")
+        .select("idType, typeName");
+
+      if (typeError || !unitTypes) {
+        return res
+          .status(500)
+          .json({ message: "Erro ao buscar tipos de unidade" });
+      }
+
+      // Encontra o tipo da unidade atual baseado no unit.typeId
+      const unitType = unitTypes.find(
+        (type: any) => type.idType === unit.typeId
+      );
+
+      // Retornar a unidade com o nome do tipo de unidade
+      const formattedUnit = {
+        ...unit,
+        typeName: unitType?.typeName || "Tipo não especificado",
+      };
+
+      res.status(200).json(formattedUnit);
     } catch (error) {
       console.error("Erro ao buscar unidade:", error);
       res.status(500).json({ error: "Erro ao buscar unidade" });
@@ -79,9 +96,9 @@ export default async function handler(
         rentalContractId,
       } = req.body;
 
-      const updatedUnit = await prisma.unit.update({
-        where: { idUnit: numericId },
-        data: {
+      const { data: updatedUnit, error: updateError } = await supabase
+        .from("Unit")
+        .update({
           address,
           addressNumber,
           unitNumber,
@@ -114,16 +131,29 @@ export default async function handler(
           listingStatus,
           highlighted,
           description,
-          features: {
-            set: features.map((featureId: number) => ({ id: featureId })),
-          },
           furnished,
           leaseStartDate: leaseStartDate ? new Date(leaseStartDate) : null,
           leaseEndDate: leaseEndDate ? new Date(leaseEndDate) : null,
           currentTenantId,
           rentalContractId,
-        },
-      });
+        })
+        .eq("idUnit", numericId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Atualizar as features da unidade, se necessário
+      if (features && features.length > 0) {
+        await supabase.from("UnitFeatures").delete().eq("unit_id", numericId);
+
+        const featureInsertions = features.map((featureId: number) => ({
+          unit_id: numericId,
+          feature_id: featureId,
+        }));
+
+        await supabase.from("UnitFeatures").insert(featureInsertions);
+      }
 
       res.status(200).json(updatedUnit);
     } catch (error) {

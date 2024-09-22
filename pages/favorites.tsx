@@ -68,7 +68,7 @@ const FavoritesPage: React.FC = () => {
   // Função para remover o card após desfavoritar
   const handleFavoriteToggle = (idUnit: string) => {
     setFavorites((prevFavorites) =>
-      prevFavorites.filter((unit) => unit.idUnit.toString() !== idUnit)
+      prevFavorites.filter((unit) => unit.idUnitUUID.toString() !== idUnit)
     );
   };
 
@@ -90,7 +90,7 @@ const FavoritesPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  ">
             {favorites.map((unit) => (
               <Card
-                key={unit.idUnit}
+                key={unit.idUnitUUID}
                 unit={unit}
                 onFavoriteToggle={handleFavoriteToggle} // Passa a função para o Card
               />

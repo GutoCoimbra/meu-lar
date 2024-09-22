@@ -64,7 +64,7 @@ const Home: NextPage<HomeProps> = ({ units }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {memoizedFilteredUnits.length > 0 ? (
             memoizedFilteredUnits.map((unit, index) => (
-              <Card key={`${unit.idUnit}-${index}`} unit={unit} />
+              <Card key={`${unit.idUnitUUID}-${index}`} unit={unit} />
             ))
           ) : (
             <p className="text-center col-span-full">
