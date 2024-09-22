@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { supabase } from "../utils/supabaseClient";
 
 interface ScheduleVisitFormProps {
-  unit_id: string;
+  idUnitUUID: string;
   visitId?: string;
   initialDate?: string;
   onClose: () => void;
@@ -11,7 +11,7 @@ interface ScheduleVisitFormProps {
 }
 
 const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
-  unit_id,
+  idUnitUUID,
   initialDate = "",
   visitId,
   onClose,
@@ -22,23 +22,24 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
   const { data: session } = useSession();
   const user = session?.user;
 
+  // Fetch user's phone on load
   useEffect(() => {
     const fetchPhone = async () => {
       if (user) {
-        const userId = user.id;
         const { data: userData, error } = await supabase
           .from("User")
           .select("phone")
-          .eq("uuidgoogle", userId)
+          .eq("uuidgoogle", user.id)
           .single();
 
         if (error) {
           console.error("Erro ao buscar telefone:", error);
-        } else if (userData && userData.phone) {
+        } else if (userData?.phone) {
           setPhone(userData.phone);
         }
       }
     };
+
     fetchPhone();
   }, [user]);
 
@@ -66,7 +67,7 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
       // Verifica se estamos atualizando ou criando uma nova visita
       if (visitId) {
         const { error } = await supabase
-          .from("visitSchedules")
+          .from("visitschedules")
           .update({
             visit_date: visitDate,
             status_visit: "pendente",
@@ -79,30 +80,32 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
         alert("Visita alterada com sucesso.");
       } else {
         const { data, error } = await supabase
-          .from("visitSchedules")
+          .from("visitschedules")
           .insert([
             {
               uuidgoogle: userId,
-              unit_id: unit_id,
+              idUnitUUID: idUnitUUID,
               visit_date: visitDate,
               status_visit: "pendente",
             },
           ])
-          .select(); // Aqui adicionei o .select() para garantir que o retorno traga o novo id
+          .select();
 
         if (error) {
           throw error;
         }
 
-        // Verificar o que realmente está vindo no retorno
-
-        // Atualizar com o ID correto da resposta
         if (data && data.length > 0 && onUpdate) {
-          const newVisitId = data[0].idVisit || data[0].id; // Ajustar de acordo com o campo correto retornado
+          const newVisitId = data[0].idVisit || data[0].id;
           onUpdate(newVisitId);
         }
 
         alert("Visita agendada com sucesso!");
+      }
+
+      // Chamar onUpdate mesmo após a alteração
+      if (onUpdate) {
+        onUpdate(visitId);
       }
 
       onClose(); // Fecha o modal após a operação bem-sucedida

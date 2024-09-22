@@ -9,7 +9,7 @@ export default async function handler(
 
   try {
     // Ajustar a consulta SQL para referenciar a coluna corretamente
-    const result = await query('SELECT * FROM "Unit" WHERE "idUnit" = $1', [
+    const result = await query('SELECT * FROM "Unit" WHERE "idUnitUUID" = $1', [
       id,
     ]);
 

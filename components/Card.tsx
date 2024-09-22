@@ -108,7 +108,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
           .from("favorite")
           .select("idfavorite")
           .eq("uuidgoogle", session.user.id)
-          .eq("idunit", idUnitUUID);
+          .eq("idUnitUUID", idUnitUUID);
 
         if (data && data.length > 0) {
           setIsFavorited(true); // Atualiza o estado se o imóvel já for favorito
@@ -135,7 +135,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
         .from("favorite")
         .delete()
         .eq("uuidgoogle", session.user.id)
-        .eq("idunit", idUnitUUID);
+        .eq("idUnitUUID", idUnitUUID);
 
       if (!error) {
         setIsFavorited(false); // Atualiza o estado de favorito
@@ -144,7 +144,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
       // Adicionar aos favoritos
       const { error } = await supabase.from("favorite").insert({
         uuidgoogle: session.user.id,
-        idunit: idUnitUUID,
+        idUnitUUID: idUnitUUID,
         createdat: new Date(),
       });
 

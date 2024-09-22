@@ -26,7 +26,7 @@ const FavoritesPage: React.FC = () => {
         // Buscar os favoritos do usuário
         const { data: favoriteUnits, error } = await supabase
           .from("favorite")
-          .select("idunit")
+          .select("idUnitUUID")
           .eq("uuidgoogle", session.user.id);
 
         if (error) {
@@ -37,13 +37,13 @@ const FavoritesPage: React.FC = () => {
 
         if (favoriteUnits && favoriteUnits.length > 0) {
           // Extrair os IDs dos imóveis favoritos
-          const unitIds = favoriteUnits.map((fav) => fav.idunit);
+          const unitIds = favoriteUnits.map((fav) => fav.idUnitUUID);
 
           // Buscar imóveis disponíveis que estão favoritados
           const { data: units, error: unitsError } = await supabase
             .from("Unit")
             .select("*")
-            .in("idUnit", unitIds) // Busca pelos ids favoritos
+            .in("idUnitUUID", unitIds) // Busca pelos ids favoritos
             .eq("available", true); // Apenas imóveis disponíveis
 
           if (unitsError) {
@@ -66,9 +66,9 @@ const FavoritesPage: React.FC = () => {
   }, [session, status, router]);
 
   // Função para remover o card após desfavoritar
-  const handleFavoriteToggle = (idUnit: string) => {
+  const handleFavoriteToggle = (idUnitUUID: string) => {
     setFavorites((prevFavorites) =>
-      prevFavorites.filter((unit) => unit.idUnitUUID.toString() !== idUnit)
+      prevFavorites.filter((unit) => unit.idUnitUUID.toString() !== idUnitUUID)
     );
   };
 

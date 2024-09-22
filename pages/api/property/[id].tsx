@@ -20,7 +20,7 @@ export default async function handler(
       const { data: unit, error: unitError } = await supabase
         .from("Unit")
         .select("*")
-        .eq("idUnit", numericId)
+        .eq("idUnitUUID", numericId)
         .single();
 
       if (unitError || !unit) {
@@ -137,7 +137,7 @@ export default async function handler(
           currentTenantId,
           rentalContractId,
         })
-        .eq("idUnit", numericId);
+        .eq("idUnitUUID", numericId);
 
       if (updateError) {
         throw updateError;
@@ -145,10 +145,13 @@ export default async function handler(
 
       // Atualizar as features da unidade, se necessário
       if (features && features.length > 0) {
-        await supabase.from("UnitFeatures").delete().eq("unit_id", numericId);
+        await supabase
+          .from("UnitFeatures")
+          .delete()
+          .eq("idUnitUUID", numericId);
 
         const featureInsertions = features.map((featureId: number) => ({
-          unit_id: numericId,
+          idUnitUUID: numericId,
           feature_id: featureId,
         }));
 

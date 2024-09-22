@@ -21,7 +21,7 @@ interface Props {
 interface Visit {
   idVisit: string;
   visit_date: string;
-  unit_id: string;
+  idUnitUUID: string;
   status_visit: string;
 }
 
@@ -46,10 +46,10 @@ const PropertyPage = ({ unit }: Props) => {
   const fetchScheduledVisit = async () => {
     if (status === "authenticated" && session?.user) {
       const { data: visitData, error: visitError } = await supabase
-        .from("visitSchedules")
-        .select("idVisit, visit_date, unit_id, status_visit")
+        .from("visitschedules")
+        .select("idVisit, visit_date, idUnitUUID, status_visit")
         .eq("uuidgoogle", session.user.id)
-        .eq("unit_id", unit?.idUnitUUID)
+        .eq("idUnitUUID", unit?.idUnitUUID)
         .in("status_visit", ["pendente", "confirmada"])
         .limit(1);
 
@@ -76,7 +76,7 @@ const PropertyPage = ({ unit }: Props) => {
   const handleUpdate = async (visitId?: string) => {
     try {
       const { error } = await supabase
-        .from("visitSchedules")
+        .from("visitschedules")
         .update({ status_visit: "pendente" }) // Atualiza o status para pendente
         .eq("idVisit", visitId);
 
@@ -163,11 +163,11 @@ const PropertyPage = ({ unit }: Props) => {
     });
   };
 
-  const rentValueNum = parseFloat(rentValue.toString());
-  const condominiumNum = parseFloat(condominium.toString());
-  const waterTaxNum = parseFloat(waterTax.toString());
-  const electricityTaxNum = parseFloat(electricityTax.toString());
-  const internetTaxNum = parseFloat(internetTax.toString());
+  const rentValueNum = parseFloat((rentValue ?? 0).toString());
+  const condominiumNum = parseFloat((condominium ?? 0).toString());
+  const waterTaxNum = parseFloat((waterTax ?? 0).toString());
+  const electricityTaxNum = parseFloat((electricityTax ?? 0).toString());
+  const internetTaxNum = parseFloat((internetTax ?? 0).toString());
 
   const settings = {
     dots: true,
@@ -290,7 +290,7 @@ const PropertyPage = ({ unit }: Props) => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <ScheduleVisitForm
-            unit_id={idUnitUUID.toString()}
+            idUnitUUID={idUnitUUID.toString()}
             visitId={existingVisit?.idVisit} // Certifique-se de que o ID da visita seja passado corretamente
             onClose={() => setIsModalOpen(false)}
             onUpdate={handleUpdate}
@@ -309,7 +309,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const units = await res.json();
 
   const paths = units.map((unit: Unit) => ({
-    params: { id: unit.idUnitUUID.toString() },
+    params: { id: unit.idUnitUUID },
   }));
 
   return { paths, fallback: "blocking" };

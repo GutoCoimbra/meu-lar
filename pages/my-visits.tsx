@@ -9,7 +9,7 @@ import Link from "next/link";
 interface Visit {
   idVisit: string;
   visit_date: string;
-  unit_id: string;
+  idUnitUUID: string;
   status_visit: string;
 }
 
@@ -20,9 +20,13 @@ const MyVisits = () => {
   const [showCancelPopup, setShowCancelPopup] = useState<Visit | null>(null);
   const [showEditForm, setShowEditForm] = useState<Visit | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isReloading, setIsReloading] = useState(false); // Estado para recarregar dados
   const { data: session, status } = useSession();
 
+  // Função para buscar as visitas
   const fetchVisits = async () => {
+    setIsReloading(true); // Sinaliza que estamos recarregando os dados
+
     if (status === "unauthenticated") {
       return alert("Você precisa estar logado para ver seus agendamentos.");
     }
@@ -34,8 +38,8 @@ const MyVisits = () => {
     const userId = session.user.id;
 
     const { data: visitData, error: visitError } = await supabase
-      .from("visitSchedules")
-      .select("idVisit, visit_date, unit_id, status_visit")
+      .from("visitschedules")
+      .select("idVisit, visit_date, idUnitUUID, status_visit")
       .eq("uuidgoogle", userId)
       .in("status_visit", ["pendente", "confirmada"]);
 
@@ -44,29 +48,29 @@ const MyVisits = () => {
     } else {
       setVisits(visitData as Visit[]);
 
-      const unitIds = visitData.map((visit) => visit.unit_id);
+      const unitIds = visitData.map((visit) => visit.idUnitUUID);
       const unitsData = await fetchUnits(unitIds);
       setUnits(unitsData);
 
       const typesData = await fetchUnitTypes();
       setTypes(typesData);
     }
+
+    setIsReloading(false); // Finaliza o recarregamento
   };
 
   useEffect(() => {
     fetchVisits();
   }, [session, status]);
 
+  // Função para buscar unidades
   const fetchUnits = async (unitIds: string[]) => {
     if (unitIds.length === 0) return [];
 
     const { data: unitsData, error: unitsError } = await supabase
       .from("Unit")
       .select("*")
-      .in(
-        "idUnit",
-        unitIds.map((id) => parseInt(id))
-      );
+      .in("idUnitUUID", unitIds);
 
     if (unitsError) {
       console.error("Erro ao buscar unidades:", unitsError.message);
@@ -75,6 +79,7 @@ const MyVisits = () => {
     return unitsData || [];
   };
 
+  // Função para buscar os tipos de unidades
   const fetchUnitTypes = async () => {
     const { data: typesData, error: typesError } = await supabase
       .from("UnitType")
@@ -107,7 +112,7 @@ const MyVisits = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("visitSchedules")
+        .from("visitschedules")
         .update({ status_visit: "cancelada" })
         .eq("idVisit", showCancelPopup.idVisit);
 
@@ -138,11 +143,14 @@ const MyVisits = () => {
       </div>
 
       <h1 className="text-left mb-4">Minhas Visitas Agendadas</h1>
-      {visits.length === 0 ? (
+
+      {isReloading ? (
+        <p>Atualizando dados...</p> // Exibe uma mensagem enquanto recarrega os dados
+      ) : visits.length === 0 ? (
         <p>Nenhuma visita agendada.</p>
       ) : (
         visits.map((visit) => {
-          const unit = units.find((u) => u.idUnit === parseInt(visit.unit_id));
+          const unit = units.find((u) => u.idUnitUUID === visit.idUnitUUID);
 
           if (unit) {
             const unitWithType = {
@@ -209,11 +217,14 @@ const MyVisits = () => {
       {showEditForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <ScheduleVisitForm
-            unit_id={showEditForm.unit_id}
+            idUnitUUID={showEditForm.idUnitUUID}
             visitId={showEditForm.idVisit}
             initialDate={showEditForm.visit_date}
             onClose={() => setShowEditForm(null)}
-            onUpdate={fetchVisits}
+            onUpdate={() => {
+              setShowEditForm(null); // Fecha o formulário
+              fetchVisits(); // Busca novamente todas as visitas após a atualização
+            }}
           />
         </div>
       )}
