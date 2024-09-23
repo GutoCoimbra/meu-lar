@@ -2,13 +2,13 @@ import { useState } from "react";
 import { supabase } from "../utils/supabaseClient";
 
 interface ReviewFormProps {
-  unitId: string;
+  idUnitUUID: string;
   userId: string;
   onReviewSubmit: () => void; // Callback para atualizar após o envio da avaliação
 }
 
 const ReviewForm: React.FC<ReviewFormProps> = ({
-  unitId,
+  idUnitUUID,
   userId,
   onReviewSubmit,
 }) => {
@@ -26,7 +26,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
 
     const { error } = await supabase.from("reviews").insert([
       {
-        unit_id: unitId,
+        idUnitUUID: idUnitUUID,
         uuidgoogle: userId,
         rating,
         comment,

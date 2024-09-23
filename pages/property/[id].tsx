@@ -74,10 +74,15 @@ const PropertyPage = ({ unit }: Props) => {
   };
 
   const handleUpdate = async (visitId?: string) => {
+    if (!visitId) {
+      console.error("Erro: idVisit não definido.");
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("visitschedules")
-        .update({ status_visit: "pendente" }) // Atualiza o status para pendente
+        .update({ status_visit: "pendente" })
         .eq("idVisit", visitId);
 
       if (error) {
@@ -88,6 +93,7 @@ const PropertyPage = ({ unit }: Props) => {
     } catch (error) {
       console.error("Erro ao atualizar a visita:", error);
     }
+
     setIsModalOpen(false); // Fecha o modal após atualização
   };
 
@@ -290,7 +296,7 @@ const PropertyPage = ({ unit }: Props) => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <ScheduleVisitForm
-            idUnitUUID={idUnitUUID.toString()}
+            idUnitUUID={idUnitUUID?.toString() || ""}
             visitId={existingVisit?.idVisit} // Certifique-se de que o ID da visita seja passado corretamente
             onClose={() => setIsModalOpen(false)}
             onUpdate={handleUpdate}

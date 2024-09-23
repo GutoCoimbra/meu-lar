@@ -66,6 +66,7 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
 
       // Verifica se estamos atualizando ou criando uma nova visita
       if (visitId) {
+        // Se o visitId estiver definido, atualizamos a visita existente
         const { error } = await supabase
           .from("visitschedules")
           .update({
@@ -79,6 +80,7 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
         }
         alert("Visita alterada com sucesso.");
       } else {
+        // Caso contrário, criamos uma nova visita
         const { data, error } = await supabase
           .from("visitschedules")
           .insert([
@@ -95,6 +97,7 @@ const ScheduleVisitForm: React.FC<ScheduleVisitFormProps> = ({
           throw error;
         }
 
+        // Após criar a visita, chamar o onUpdate com o novo ID da visita
         if (data && data.length > 0 && onUpdate) {
           const newVisitId = data[0].idVisit || data[0].id;
           onUpdate(newVisitId);

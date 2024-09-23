@@ -5,6 +5,7 @@ import { ArrowPrev, ArrowNext } from "./Arrow";
 import { Unit } from "@/types"; // Importando a interface Unit do arquivo types.ts
 import { supabase } from "../utils/supabaseClient"; // Supabase client
 import { useSession, signIn } from "next-auth/react"; // Autenticação
+import { fetchAverageRating } from "@/utils/reviewUtils";
 
 interface CardProps {
   unit: Unit | null;
@@ -17,16 +18,24 @@ interface CardProps {
 const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
   const router = useRouter();
   const [imagesAndVideos, setImagesAndVideos] = useState<string[]>([]);
+  const [averageRating, setAverageRating] = useState<number>(0); // Estado para armazenar a média de avaliações
   const prevImgUrlRef = useRef<string | string[] | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
-  const [showLoginPopup, setShowLoginPopup] = useState(false); // Controle do pop-up de login
-  const [pendingFavorite, setPendingFavorite] = useState<string | null>(null); // Estado para o imóvel pendente de favoritar
-  const [currentSlide, setCurrentSlide] = useState(0); // Estado para acompanhar o slide atual
-  const { data: session, status } = useSession(); // Sessão do usuário logado
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [pendingFavorite, setPendingFavorite] = useState<string | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const { data: session, status } = useSession();
 
-  if (!unit) {
-    return null;
-  }
+  useEffect(() => {
+    if (!unit) return;
+
+    const fetchRating = async () => {
+      const rating = await fetchAverageRating(unit.idUnitUUID);
+      setAverageRating(rating); // Atualiza o estado com a média de avaliações
+    };
+
+    fetchRating();
+  }, [unit]);
 
   const {
     idUnitUUID,
@@ -44,9 +53,8 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
     squareMeter,
     rooms,
     garage,
-    averageRating,
     imgUrl,
-  } = unit;
+  } = unit ?? {}; // Certificando-se de desestruturar o `unit` corretamente
 
   const parsedUrls = useMemo(() => {
     if (typeof imgUrl === "string") {
@@ -68,7 +76,11 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
   }, [parsedUrls]);
 
   const totalValue =
-    rentValue + condominium + waterTax + electricityTax + internetTax;
+    (rentValue ?? 0) +
+    (condominium ?? 0) +
+    (waterTax ?? 0) +
+    (electricityTax ?? 0) +
+    (internetTax ?? 0);
 
   // Configurações do carrossel
   const settings = {
@@ -125,7 +137,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
   const toggleFavorite = async () => {
     if (!session?.user?.id || !idUnitUUID) {
       setShowLoginPopup(true); // Abre o popup de login se o usuário não estiver logado
-      setPendingFavorite(idUnitUUID.toString()); // Armazena o imóvel para favoritar após o login
+      setPendingFavorite(idUnitUUID ?? null); // Armazena o imóvel para favoritar após o login
       return;
     }
 
@@ -239,7 +251,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
           </p>
           <p className="text-sm text-gray-700 mb-2">
             R${" "}
-            {rentValue.toLocaleString("pt-BR", {
+            {(rentValue ?? 0).toLocaleString("pt-BR", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}{" "}
@@ -252,8 +264,9 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
           </p>
           <div className="font-sans flex justify-between items-start">
             <p className="text-xs font-bold text-gray-700 mb-3">
-              {squareMeter} m² - {rooms} {rooms > 1 ? "Cômodos" : "Cômodo"} -{" "}
-              {garage} {garage > 1 ? "Vagas" : "Vaga"}
+              {squareMeter} m² - {rooms}{" "}
+              {(rooms ?? 0) > 1 ? "Cômodos" : "Cômodo"} - {garage}{" "}
+              {(garage ?? 0) > 1 ? "Vagas" : "Vaga"}
             </p>
             <p className="flex text-xs font-bold text-gray-700 mb-3">
               <svg

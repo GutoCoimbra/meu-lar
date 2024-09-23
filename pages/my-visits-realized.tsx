@@ -8,7 +8,7 @@ import Card from "@/components/Card";
 interface Visit {
   idVisit: string;
   visit_date: string;
-  unit_id: string;
+  idUnitUUID: string;
   status_visit: string;
 }
 
@@ -30,8 +30,8 @@ const MyVisitsRealized = () => {
       const userId = session.user.id;
 
       const { data: visitData, error: visitError } = await supabase
-        .from("visitSchedules")
-        .select("idVisit, visit_date, unit_id, status_visit")
+        .from("visitschedules")
+        .select("idVisit, visit_date, idUnitUUID, status_visit")
         .eq("uuidgoogle", userId)
         .eq("status_visit", "realizada"); // Filtrar visitas com status "realizada"
 
@@ -40,7 +40,7 @@ const MyVisitsRealized = () => {
       } else {
         setVisits(visitData as Visit[]);
 
-        const unitIds = visitData.map((visit) => visit.unit_id);
+        const unitIds = visitData.map((visit) => visit.idUnitUUID);
         const unitsData = await fetchUnits(unitIds);
         setUnits(unitsData);
       }
@@ -56,8 +56,8 @@ const MyVisitsRealized = () => {
       .from("Unit")
       .select("*")
       .in(
-        "idUnit",
-        unitIds.map((id) => parseInt(id))
+        "idUnitUUID",
+        unitIds.map((id) => id)
       );
 
     if (unitsError) {
@@ -75,7 +75,7 @@ const MyVisitsRealized = () => {
         <p>Nenhuma visita realizada.</p>
       ) : (
         visits.map((visit) => {
-          const unit = units.find((u) => u.idUnit === parseInt(visit.unit_id));
+          const unit = units.find((u) => u.idUnitUUID === visit.idUnitUUID);
 
           return (
             <div key={visit.idVisit} className="mb-4 text-left">

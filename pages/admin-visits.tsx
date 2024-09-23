@@ -15,7 +15,7 @@ const AdminVisits = () => {
     const fetchVisitsAndUnits = async () => {
       // Busca as visitas que não estão canceladas ou realizadas
       const { data: visitsData, error: visitsError } = await supabase
-        .from("visitSchedules")
+        .from("visitschedules")
         .select("*")
         .not("status_visit", "eq", "cancelada")
         .not("status_visit", "eq", "rejeitada")
@@ -33,7 +33,7 @@ const AdminVisits = () => {
       const { data: unitsData, error: unitsError } = await supabase
         .from("Unit")
         .select("*")
-        .in("idUnit", unitIds);
+        .in("idUnitUUID", unitIds);
 
       if (unitsError) {
         console.error("Erro ao buscar unidades:", unitsError.message);
@@ -49,7 +49,7 @@ const AdminVisits = () => {
   const handleConfirmClick = async (visitId: string) => {
     setIsLoading(true);
     const { error } = await supabase
-      .from("visitSchedules")
+      .from("visitschedules")
       .update({ status_visit: "confirmada" })
       .eq("idVisit", visitId);
 
@@ -73,7 +73,7 @@ const AdminVisits = () => {
     if (selectedVisit) {
       setIsLoading(true);
       const { error } = await supabase
-        .from("visitSchedules")
+        .from("visitschedules")
         .update({
           status_visit: "rejeitada",
           rejection_reason: rejectionReason, // Salva o motivo da rejeição
@@ -104,7 +104,7 @@ const AdminVisits = () => {
   const handleRealizedClick = async (visitId: string) => {
     setIsLoading(true);
     const { error } = await supabase
-      .from("visitSchedules")
+      .from("visitschedules")
       .update({ status_visit: "realizada" })
       .eq("idVisit", visitId);
 
