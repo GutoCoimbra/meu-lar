@@ -82,43 +82,20 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-    const resUnits = await fetch(`${siteUrl}/api/units`);
+    const resUnits = await fetch(`${siteUrl}/api/unitsStatic`);
     if (!resUnits.ok) {
       throw new Error("Failed to fetch units");
     }
-    const units: Unit[] = await resUnits.json();
+    let units: Unit[] | Unit = await resUnits.json();
 
-    if (!units || units.length === 0) {
-      return { props: { units: [] } };
+    if (!Array.isArray(units)) {
+      console.log("Units is not an array, converting to array");
+      units = [units]; // Converte em array se for um objeto único
     }
-
-    const resTypes = await fetch(`${siteUrl}/api/unitType`);
-    if (!resTypes.ok) {
-      throw new Error("Failed to fetch types");
-    }
-    const types = await resTypes.json();
-
-    const typeMap = types.reduce(
-      (
-        acc: { [key: number]: string },
-        type: { idType: number; typeName: string }
-      ) => {
-        acc[type.idType] = type.typeName;
-        return acc;
-      },
-      {}
-    );
-
-    const availableUnits = units
-      .filter((unit) => unit.available === true)
-      .map((unit) => ({
-        ...unit,
-        typeName: unit.typeId ? typeMap[unit.typeId] : "Tipo não especificado",
-      }));
 
     return {
       props: {
-        units: availableUnits,
+        units,
       },
     };
   } catch (error) {

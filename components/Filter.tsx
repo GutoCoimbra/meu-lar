@@ -18,10 +18,16 @@ const Filter: React.FC<FilterProps> = React.memo(({ onFilter, units }) => {
   const [address, setAddress] = useState("");
 
   const states = useMemo(() => {
+    if (!units || !Array.isArray(units)) {
+      return []; // Garante que sempre retornamos um array
+    }
     return Array.from(new Set(units.map((unit) => unit.state)));
   }, [units]);
 
   const cities = useMemo(() => {
+    if (!units || !Array.isArray(units)) {
+      return []; // Garante que sempre retornamos um array
+    }
     const filteredUnits = units.filter(
       (unit) => state === "" || unit.state === state
     );
@@ -29,6 +35,9 @@ const Filter: React.FC<FilterProps> = React.memo(({ onFilter, units }) => {
   }, [units, state]);
 
   const neighborhoods = useMemo(() => {
+    if (!units || !Array.isArray(units)) {
+      return []; // Garante que sempre retornamos um array
+    }
     const filteredUnits = units.filter(
       (unit) =>
         (state === "" || unit.state === state) &&
@@ -38,6 +47,9 @@ const Filter: React.FC<FilterProps> = React.memo(({ onFilter, units }) => {
   }, [units, state, city]);
 
   const addresses = useMemo(() => {
+    if (!units || !Array.isArray(units)) {
+      return []; // Garante que sempre retornamos um array
+    }
     const filteredUnits = units.filter(
       (unit) =>
         (state === "" || unit.state === state) &&
