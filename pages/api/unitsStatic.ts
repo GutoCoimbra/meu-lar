@@ -7,7 +7,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    // Verificar se os dados estáticos estão no cache do Redis
     const cachedProperties = await redis.get("units");
     let properties;
 
@@ -41,11 +40,14 @@ export default async function handler(
         JOIN "UnitType" ut ON u."typeId" = ut."idType"
       `);
       console.log("Consulta concluída:", result);
-      properties = result.rows;
 
-      if (!properties || properties.length === 0) {
+      // Verificar se result.rows existe e contém dados
+      if (!result.rows || result.rows.length === 0) {
+        console.log("Nenhum imóvel encontrado");
         return res.status(404).json({ error: "Nenhum imóvel encontrado" });
       }
+
+      properties = result.rows;
 
       // Armazenar os dados estáticos no cache do Redis por 1 dia
       await redis.set("units", JSON.stringify(properties), { EX: 86400 });
@@ -66,6 +68,7 @@ export default async function handler(
         FROM "Unit" u
       `);
       console.log("Consulta de disponibilidade concluída:", availableStatuses);
+
       availabilityMap = new Map(
         availableStatuses.rows.map(
           (row: { idUnitUUID: string; available: boolean }) => [
