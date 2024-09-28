@@ -15,6 +15,8 @@ export default async function handler(
       console.log("Servindo dados básicos do cache Redis");
       properties = JSON.parse(cachedProperties);
     } else {
+      console.log("Iniciando consulta ao banco de dados...");
+
       // Buscar os dados estáticos do banco de dados
       const result = await query(`
         SELECT 
@@ -38,7 +40,7 @@ export default async function handler(
         FROM "Unit" u
         JOIN "UnitType" ut ON u."typeId" = ut."idType"
       `);
-
+      console.log("Consulta concluída:", result);
       properties = result.rows;
 
       if (!properties || properties.length === 0) {
@@ -63,7 +65,7 @@ export default async function handler(
         SELECT u."idUnitUUID", u."available" 
         FROM "Unit" u
       `);
-
+      console.log("Consulta de disponibilidade concluída:", availableStatuses);
       availabilityMap = new Map(
         availableStatuses.rows.map(
           (row: { idUnitUUID: string; available: boolean }) => [
