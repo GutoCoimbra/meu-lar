@@ -7,20 +7,20 @@ export default async function handler(
 ) {
   const { id } = req.query;
 
-  // Verifica se o ID é fornecido e é um número válido
-  if (!id || Array.isArray(id) || isNaN(Number(id))) {
+  // Verifica se o ID é fornecido e é uma string válida
+  if (!id || Array.isArray(id)) {
     return res.status(400).json({ message: "ID inválido" });
   }
 
-  const numericId = Number(id);
+  const unitUUID = id.toString();
 
   if (req.method === "GET") {
     try {
-      // Consulta a unidade
+      // Consulta a unidade usando o UUID como string
       const { data: unit, error: unitError } = await supabase
         .from("Unit")
         .select("*")
-        .eq("idUnitUUID", numericId)
+        .eq("idUnitUUID", unitUUID) // Usa o UUID diretamente
         .single();
 
       if (unitError || !unit) {
@@ -137,7 +137,7 @@ export default async function handler(
           currentTenantId,
           rentalContractId,
         })
-        .eq("idUnitUUID", numericId);
+        .eq("idUnitUUID", unitUUID); // Usa o UUID diretamente
 
       if (updateError) {
         throw updateError;
@@ -145,13 +145,10 @@ export default async function handler(
 
       // Atualizar as features da unidade, se necessário
       if (features && features.length > 0) {
-        await supabase
-          .from("UnitFeatures")
-          .delete()
-          .eq("idUnitUUID", numericId);
+        await supabase.from("UnitFeatures").delete().eq("idUnitUUID", unitUUID);
 
         const featureInsertions = features.map((featureId: number) => ({
-          idUnitUUID: numericId,
+          idUnitUUID: unitUUID,
           feature_id: featureId,
         }));
 

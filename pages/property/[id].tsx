@@ -297,7 +297,7 @@ const PropertyPage = ({ unit }: Props) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <ScheduleVisitForm
             idUnitUUID={idUnitUUID?.toString() || ""}
-            visitId={existingVisit?.idVisit} // Certifique-se de que o ID da visita seja passado corretamente
+            visitId={existingVisit?.idVisit}
             onClose={() => setIsModalOpen(false)}
             onUpdate={handleUpdate}
           />
@@ -337,6 +337,6 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
 
   return {
     props: { unit },
-    revalidate: 60, // Revalida a cada 60 segundos
+    revalidate: 60,
   };
 };
