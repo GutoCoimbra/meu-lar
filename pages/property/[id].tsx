@@ -11,7 +11,7 @@ import PropertyFeatures from "@/components/PropertyFeatures";
 import AvailableItems from "@/components/AvailableItems";
 import VisitButton from "@/components/VisitButton";
 import ScheduleVisitForm from "../../components/ScheduleVisitForm";
-import { supabase } from "../../utils/supabaseClient";
+import { supabase } from "../../utils/supabase";
 import { Unit } from "@/types";
 
 interface Props {

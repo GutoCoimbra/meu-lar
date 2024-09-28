@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Slider from "react-slick";
 import { ArrowPrev, ArrowNext } from "./Arrow";
 import { Unit } from "@/types"; // Importando a interface Unit do arquivo types.ts
-import { supabase } from "../utils/supabaseClient"; // Supabase client
+import { supabase } from "../utils/supabase"; // Supabase client
 import { useSession, signIn } from "next-auth/react"; // Autenticação
 import { fetchAverageRating } from "@/utils/reviewUtils";
 
@@ -44,7 +44,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
     city,
     state,
     unitNumber,
-    typeName, // Agora recebemos `typeName` diretamente
+    typeName,
     rentValue,
     condominium,
     waterTax,
@@ -54,7 +54,7 @@ const Card: React.FC<CardProps> = React.memo(({ unit, onFavoriteToggle }) => {
     rooms,
     garage,
     imgUrl,
-  } = unit ?? {}; // Certificando-se de desestruturar o `unit` corretamente
+  } = unit ?? {};
 
   const parsedUrls = useMemo(() => {
     if (typeof imgUrl === "string") {

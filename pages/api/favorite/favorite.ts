@@ -1,4 +1,4 @@
-import { supabase } from "../../../utils/supabaseClient"; // Importe a configuração do Supabase
+import { supabase } from "../../../utils/supabase"; // Importe a configuração do Supabase
 
 const addToFavorites = async (idRenter: number, idUnit: number) => {
   const { data, error } = await supabase

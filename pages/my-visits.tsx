@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { supabase } from "../utils/supabaseClient";
+import { supabase } from "../utils/supabase";
 import Header from "@/components/Header";
 import Card from "@/components/Card";
 import ScheduleVisitForm from "@/components/ScheduleVisitForm";

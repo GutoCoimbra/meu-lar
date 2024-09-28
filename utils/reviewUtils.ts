@@ -1,6 +1,6 @@
 // utils/reviewUtils.ts
 
-import { supabase } from "../utils/supabaseClient";
+import { supabase } from "./supabase";
 
 export const fetchAverageRating = async (
   idUnitUUID: string

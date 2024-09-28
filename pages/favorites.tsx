@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { supabase } from "../utils/supabaseClient"; // Conexão com o Supabase
+import { supabase } from "../utils/supabase"; // Conexão com o Supabase
 import { Unit } from "@/types"; // Definição do tipo Unit
 import Card from "@/components/Card"; // Reutilize o componente Card
 import Header from "@/components/Header";

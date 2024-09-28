@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../utils/supabaseClient";
+import { supabase } from "../utils/supabase";
 import Header from "@/components/Header";
 import { Unit, Visit as VisitType } from "@/types"; // Importando as interfaces do types.ts
 import Card from "@/components/Card"; // Importa o componente de card já existente

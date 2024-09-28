@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Renter } from "../types";
-import { supabase } from "../utils/supabaseClient";
+import { supabase } from "../utils/supabase";
 import { uploadFileToFolder } from "../utils/uploadFile";
 import Header from "@/components/Header";
 import { useSession } from "next-auth/react";

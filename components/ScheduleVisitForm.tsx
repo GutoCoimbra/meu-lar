@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { supabase } from "../utils/supabaseClient";
+import { supabase } from "../utils/supabase";
 
 interface ScheduleVisitFormProps {
   idUnitUUID: string;

@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { supabase } from "../../../utils/supabaseClient";
+import { supabase } from "../../../utils/supabase";
 
 export default NextAuth({
   providers: [

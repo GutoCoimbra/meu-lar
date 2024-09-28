@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "./supabase";
 import { v4 as uuidv4 } from "uuid"; // Importa a função para gerar UUID
 
 export const uploadFileToFolder = async (file: File, folder: string) => {
