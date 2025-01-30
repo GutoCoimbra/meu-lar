@@ -3,10 +3,10 @@ export interface Unit {
   idUnitUUID: string;
   address: string;
   addressNumber: string;
-  unitNumber: string;
+  unitnumber: string;
   typeId?: number | null;
-  typeName?: string; // Novo campo para o nome do tipo
-  squareMeter: number;
+  typename?: string; // Novo campo para o nome do tipo
+  squaremeter: number;
   rooms: number;
   bathroom: number;
   garage: number;
@@ -18,15 +18,15 @@ export interface Unit {
   available: boolean;
   availableItems: string[];
   elevator: boolean;
-  rentValue: number;
+  rentvalue: number;
   condominium: number;
-  waterTax: number;
-  electricityTax: number;
-  internetTax: number;
-  depositValue: number;
-  maintenanceFee: number;
+  watertax: number;
+  electricitytax: number;
+  internettax: number;
+  depositvalue: number;
+  maintenancefee: number;
   lastMaintenanceDate?: Date | null;
-  imgUrl: string | string[];
+  imgurl: string | string[];
   accessInstructions: string;
   documents: string[];
   averageRating?: number | null;
@@ -149,6 +149,7 @@ export interface MaintenanceRequest {
 // Definição dos tipos para a tabela User
 export interface User {
   idUser: number; // Chave primária autoincrementável
+  idUserUUID: string;
   username: string; // Nome de usuário
   passwordHash: string; // Hash da senha
   email: string; // Endereço de e-mail
@@ -182,4 +183,9 @@ export interface Visit {
   idUnitUUID: string; // Alterado de unit_id para idUnitUUID
   status_visit: string;
   rejection_reason?: string; // Para armazenar o motivo da rejeição
+}
+
+export interface UnitType {
+  idType: number;
+  typeName: string;
 }

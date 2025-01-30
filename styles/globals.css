@@ -27,34 +27,6 @@ header {
   justify-content: space-between;
 }
 
-/* Estilos para Slick Carousel */
-.slick-prev,
-.slick-next {
-  z-index: 1;
-}
-
-.slick-prev {
-  left: 25px;
-}
-
-.slick-next {
-  right: 25px;
-}
-
-/* Estilos para Dots Customizados */
-.custom-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #fff;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.custom-dot.slick-active {
-  background-color: #0070f3;
-}
-
 /* Classe para Botão */
 .btn {
   @apply bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300 ease-in-out;
@@ -62,13 +34,6 @@ header {
 
 .btnWhite {
   @apply bg-white text-gray-500 font-bold py-1 px-4 md:px-4 lg:px-4 rounded-full w-auto max-w-xs md:max-w-md lg:max-w-lg hover:bg-blue-700 hover:text-white transition duration-300 ease-in-out opacity-50 left-1/2 transform -translate-x-1/2 mb-2;
-}
-
-.custom-dot-active {
-  background-color: #fff; /* Blue 700 */
-}
-.custom-dot-inactive {
-  background-color: #9ca3af; /* Gray 400 */
 }
 
 /* Adicione este estilo ao popup */
@@ -85,4 +50,72 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.relative {
+  overflow: visible; /* Permite que os filhos sejam visíveis fora do limite */
+}
+
+.slick-prev,
+.slick-next {
+  z-index: 50; /* Garante que as setas fiquem visíveis */
+  width: 36px;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.6); /* Fundo semitransparente */
+  border-radius: 50%; /* Forma circular */
+  color: white; /* Cor branca para contraste */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.slick-prev {
+  left: 4px; /* Move a seta esquerda mais para dentro da imagem */
+}
+
+.slick-next {
+  right: 4px; /* Move a seta direita mais para dentro da imagem */
+}
+
+.slick-prev:before,
+.slick-next:before {
+  content: none; /* Remove os ícones padrão do Slick */
+}
+.slick-dots {
+  position: absolute;
+  bottom: 8px; /* Posiciona os pontos dentro da imagem */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 50;
+}
+
+/* Estilo padrão (pontos inativos) */
+.slick-dots li button:before {
+  font-size: 8px !important;
+  color: white !important; /* Cor para pontos inativos */
+  opacity: 0.5 !important; /* Opacidade para pontos inativos */
+  transition: all 0.3s ease !important;
+}
+
+/* Estilo para o ponto ativo */
+.slick-dots li.slick-active button:before {
+  color: black !important; /* Cor para o ponto ativo */
+  opacity: 1 !important; /* Visibilidade total */
+}
+
+/* Estilo do contêiner dos pontos */
+.slick-dots {
+  display: flex !important;
+  justify-content: center !important;
+  bottom: 8px !important;
+  position: absolute !important;
+  width: 100%;
+}
+
+/* Estilo para corrigir possíveis sobrescrições */
+.slick-slider .slick-dots {
+  z-index: 50 !important;
 }

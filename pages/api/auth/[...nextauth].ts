@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { supabase } from "../../../utils/supabase";
+import { query } from "../../../utils/db";
 
 export default NextAuth({
   providers: [
@@ -12,17 +12,16 @@ export default NextAuth({
   callbacks: {
     async session({ session, token }) {
       try {
-        const { data, error } = await supabase
-          .from("User")
-          .select("UUIDGoogle")
-          .eq("email", session.user.email)
-          .single();
+        const result = await query(
+          'SELECT uuidgoogle FROM "User" WHERE email = $1 LIMIT 1',
+          [session.user.email]
+        );
 
-        session.user.isRegistered = data?.UUIDGoogle ? true : false;
+        session.user.isRegistered = result.rows.length > 0;
       } catch (err) {
         const error = err as Error;
         console.error(
-          "Erro ao verificar o registro do usuário no Supabase:",
+          "Erro ao verificar o registro do usuário no banco de dados:",
           error.message
         );
         session.user.isRegistered = false;
@@ -38,34 +37,22 @@ export default NextAuth({
     },
     async signIn({ account, profile }) {
       if (account?.provider === "google" && profile) {
-        // Armazena os dados do usuário no banco de dados ao logar
         try {
-          const { error } = await supabase.from("User").upsert(
-            {
-              email: profile.email,
-              username: profile.name,
-              uuidgoogle: profile.sub, // UUID do Google
-            },
-            { onConflict: "uuidgoogle" }
+          await query(
+            `INSERT INTO "User" (email, username, uuidgoogle)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (uuidgoogle) DO NOTHING`,
+            [profile.email, profile.name, profile.sub]
           );
 
-          if (error) {
-            console.error("Erro ao salvar os dados do usuário:", error.message);
-            return false;
-          }
-
           return true; // Permitir o login
-        } catch (err) {
-          console.error("Erro ao tentar armazenar os dados do usuário:", err);
+        } catch (error) {
+          console.error("Erro ao salvar os dados do usuário:", error);
           return false;
         }
       }
       console.error("Provider não suportado ou falha no perfil");
       return false; // Falha ao logar
     },
-    // // Callback para redirecionar o usuário após o login
-    // async redirect({ url, baseUrl }) {
-    //   return baseUrl; // Redireciona para a página principal ("/")
-    // },
   },
 });

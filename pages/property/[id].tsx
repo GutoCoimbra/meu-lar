@@ -12,22 +12,10 @@ import AvailableItems from "@/components/AvailableItems";
 import VisitButton from "@/components/VisitButton";
 import ScheduleVisitForm from "../../components/ScheduleVisitForm";
 import { supabase } from "../../utils/supabase";
-import { Unit } from "@/types";
+import { Unit, Visit, UnitType } from "@/types";
 
 interface Props {
   unit: Unit | null;
-}
-
-interface Visit {
-  idVisit: string;
-  visit_date: string;
-  idUnitUUID: string;
-  status_visit: string;
-}
-
-interface UnitType {
-  idType: number;
-  typeName: string;
 }
 
 const PropertyPage = ({ unit }: Props) => {
