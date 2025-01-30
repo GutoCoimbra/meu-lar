@@ -1,4 +1,3 @@
-import { query } from "../utils/db";
 import type { NextPage, GetServerSideProps } from "next";
 import Header from "../components/Header";
 import Card from "../components/Card";
@@ -7,10 +6,9 @@ import { Unit } from "../types";
 
 interface HomeProps {
   units: Unit[];
-  totalUnits: number;
 }
 
-const Home: NextPage<HomeProps> = ({ units, totalUnits }) => {
+const Home: NextPage<HomeProps> = ({ units }) => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 overflow-y-auto">
       <div className="w-full">
@@ -37,59 +35,37 @@ const Home: NextPage<HomeProps> = ({ units, totalUnits }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async ({
-  query: queryParams,
-}) => {
-  const page = queryParams.page ? parseInt(queryParams.page as string) : 1;
-  const limit = 2; // Número de unidades por página
-  const offset = (page - 1) * limit;
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  try {
+    // Obtendo a URL base da API a partir da variável de ambiente
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  const unitsResult = await query(
-    `SELECT 
-  idUnitUUID, 
-  typename,
-  unitNumber,
-  address, 
-  city, 
-  state, 
-neighborhood,
-squaremeter,
-  rentvalue::float AS rentvalue, -- Força o tipo numérico
-  condominium::float AS condominium,
-  watertax::float AS watertax,
-  electricitytax::float AS electricitytax,
-  internettax::float AS internettax,
-  depositvalue::float AS depositvalue,
-  imgUrl 
-FROM "Unit"
-WHERE available = true
-ORDER BY createdAt DESC
-LIMIT $1 OFFSET $2`,
-    [limit, offset]
-  );
+    if (!apiBaseUrl) {
+      throw new Error("A variável NEXT_PUBLIC_API_BASE_URL não está definida.");
+    }
 
-  const totalUnitsResult = await query(
-    `SELECT COUNT(*) FROM "Unit" WHERE available = true`
-  );
+    // Fazendo a requisição à API para obter as unidades
+    const response = await fetch(`${apiBaseUrl}/units`);
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar unidades: ${response.statusText}`);
+    }
 
-  const units = unitsResult.rows.map((unit) => ({
-    ...unit,
-    imgUrl: Array.isArray(unit.imgurl)
-      ? unit.imgurl
-      : unit.imgurl
-      ? unit.imgurl
-          .replace(/[{}]/g, "")
-          .split(",")
-          .map((url: string) => url.trim())
-      : [],
-  }));
+    const units = await response.json();
 
-  return {
-    props: {
-      units,
-      totalUnits: parseInt(totalUnitsResult.rows[0].count, 10),
-    },
-  };
+    return {
+      props: {
+        units,
+      },
+    };
+  } catch (error) {
+    console.error("Erro no getServerSideProps:", error);
+
+    return {
+      props: {
+        units: [],
+      },
+    };
+  }
 };
 
 export default Home;

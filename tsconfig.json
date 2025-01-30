@@ -24,7 +24,8 @@
     "pages/api/auth/[...nextauth]",
     "types", // Mantém a pasta onde está o arquivo de declaração de tipos
     "components/AdminForm.tsx",
-    "styles/**/*.css" // Adiciona suporte para arquivos CSS globais e Tailwind
+    "styles/**/*.css", // Adiciona suporte para arquivos CSS globais e Tailwind
+    "components/Arrow.tsx"
   ],
   "exclude": ["node_modules"]
 }

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,205 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Unit {
+  idunituuid          String               @id(map: "unit_pkey") @db.Uuid
+  address             String               @db.VarChar(255)
+  addressnumber       String               @db.VarChar(50)
+  unitnumber          String?              @db.VarChar(50)
+  typeid              Int?
+  typename            String?              @db.VarChar(100)
+  squaremeter         Decimal              @db.Decimal(10, 2)
+  rooms               Int
+  bathroom            Int
+  garage              Int
+  floor               Int
+  neighborhood        String               @db.VarChar(255)
+  city                String               @db.VarChar(255)
+  state               String               @db.VarChar(50)
+  zipcode             String               @db.VarChar(20)
+  available           Boolean
+  availableitems      String[]
+  elevator            Boolean
+  rentvalue           Decimal              @db.Decimal(10, 2)
+  condominium         Decimal?             @db.Decimal(10, 2)
+  watertax            Decimal?             @db.Decimal(10, 2)
+  electricitytax      Decimal?             @db.Decimal(10, 2)
+  internettax         Decimal?             @db.Decimal(10, 2)
+  depositvalue        Decimal?             @db.Decimal(10, 2)
+  maintenancefee      Decimal?             @db.Decimal(10, 2)
+  lastmaintenancedate DateTime?            @db.Timestamp(6)
+  imgurl              String[]
+  accessinstructions  String?
+  documents           String[]
+  averagerating       Decimal?             @db.Decimal(3, 2)
+  petallowed          Boolean
+  smokingallowed      Boolean
+  listingstatus       String?              @db.VarChar(50)
+  highlighted         Boolean
+  createdat           DateTime             
+  updatedat           DateTime             
+  description         String?
+  features            String[]
+  furnished           Boolean
+  leasestartdate      DateTime?            @db.Timestamp(6)
+  leaseenddate        DateTime?            @db.Timestamp(6)
+  currenttenantid     Int?
+  rentalcontractid    Int?
+  maintenancerequest  maintenancerequest[]
+  rentalcontract      rentalcontract[]
+  rentalhistory       rentalhistory[]
+  unititem            unititem[]
+  visit               visit[]
+}
+
+model User {
+  iduser       Int            @id @default(autoincrement())
+  iduseruuid   String         @db.Uuid
+  username     String         @db.VarChar(255)
+  passwordhash String
+  email        String         @db.VarChar(255)
+  role         String?        @db.VarChar(50)
+  createdat    DateTime?      @default(now()) @db.Timestamp(6)
+  updatedat    DateTime?      @default(now()) @db.Timestamp(6)
+  phonenumber  String?        @db.VarChar(20)
+  address      String?
+  status       String?        @db.VarChar(50)
+  notification notification[]
+}
+
+model feature {
+  id   String @id @db.Uuid
+  name String @db.VarChar(100)
+}
+
+model item {
+  iditem   Int        @id @default(autoincrement())
+  name     String     @db.VarChar(255)
+  unititem unititem[]
+}
+
+model maintenancerequest {
+  idrequest      Int       @id @default(autoincrement())
+  idunituuid     String?   @db.Uuid
+  requestdate    DateTime? @db.Timestamp(6)
+  description    String?
+  status         String?   @db.VarChar(50)
+  assignedto     String?   @db.VarChar(255)
+  completiondate DateTime? @db.Timestamp(6)
+  priority       String?   @db.VarChar(50)
+  estimatedcost  Decimal?  @db.Decimal(10, 2)
+  actualcost     Decimal?  @db.Decimal(10, 2)
+  Unit           Unit?     @relation(fields: [idunituuid], references: [idunituuid], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model notification {
+  idnotification   Int       @id @default(autoincrement())
+  userid           Int?
+  message          String?
+  status           String?   @db.VarChar(50)
+  createdat        DateTime? @default(now()) @db.Timestamp(6)
+  notificationtype String?   @db.VarChar(50)
+  readat           DateTime? @db.Timestamp(6)
+  User             User?     @relation(fields: [userid], references: [iduser], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model payment {
+  idpayment        Int             @id @default(autoincrement())
+  contractid       Int?
+  paymentdate      DateTime?       @db.Timestamp(6)
+  amount           Decimal?        @db.Decimal(10, 2)
+  paymentmethod    String?         @db.VarChar(50)
+  paymentstatus    String?         @db.VarChar(50)
+  duedate          DateTime?       @db.Timestamp(6)
+  latefee          Decimal?        @db.Decimal(10, 2)
+  paymentreference String?         @db.VarChar(255)
+  rentalcontract   rentalcontract? @relation(fields: [contractid], references: [idcontract], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model rentalcontract {
+  idcontract      Int       @id @default(autoincrement())
+  idunituuid      String?   @db.Uuid
+  renterid        Int?
+  startdate       DateTime  @db.Timestamp(6)
+  enddate         DateTime  @db.Timestamp(6)
+  contractterms   String?
+  monthlyrent     Decimal   @db.Decimal(10, 2)
+  securitydeposit Decimal?  @db.Decimal(10, 2)
+  status          String?   @db.VarChar(50)
+  renewaloption   Boolean?
+  penaltyterms    String?
+  notes           String?
+  payment         payment[]
+  Unit            Unit?     @relation(fields: [idunituuid], references: [idunituuid], onDelete: Cascade, onUpdate: NoAction)
+  renter          renter?   @relation(fields: [renterid], references: [idrenter], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model rentalhistory {
+  id         Int      @id @default(autoincrement())
+  idunituuid String?  @db.Uuid
+  tenantid   Int
+  startdate  DateTime @db.Timestamp(6)
+  enddate    DateTime @db.Timestamp(6)
+  feedback   String?
+  Unit       Unit?    @relation(fields: [idunituuid], references: [idunituuid], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model renter {
+  idrenter                     Int              @id @default(autoincrement())
+  uuid                         String           @db.Uuid
+  namerenter                   String           @db.VarChar(255)
+  emailrenter                  String           @db.VarChar(255)
+  phonerenter                  String           @db.VarChar(20)
+  addressrenter                String?          @db.VarChar(255)
+  addressnumber                String?          @db.VarChar(50)
+  neighborhood                 String?          @db.VarChar(255)
+  city                         String?          @db.VarChar(255)
+  state                        String?          @db.VarChar(50)
+  zipcode                      String?          @db.VarChar(20)
+  cpfrenter                    BigInt
+  idtrenter                    BigInt
+  idtsenderrenter              String?          @db.VarChar(50)
+  maritalstatusrenter          String?          @db.VarChar(50)
+  birthdaterenter              DateTime?        @db.Date
+  ciaworksrenter               String?          @db.VarChar(255)
+  admissiondatarenter          DateTime?        @db.Date
+  salaryrenter                 Decimal?         @db.Decimal(10, 2)
+  idunitintended               Int?
+  bankaccount                  String?          @db.VarChar(50)
+  paymentmethod                String?          @db.VarChar(50)
+  creditscore                  Int?
+  preferredcontactmethod       String?          @db.VarChar(50)
+  newslettersubscribed         Boolean?
+  createdat                    DateTime?        @default(now()) @db.Timestamp(6)
+  updatedat                    DateTime?        @default(now()) @db.Timestamp(6)
+  lastlogin                    DateTime?        @db.Timestamp(6)
+  documenturl                  String[]
+  emergencycontactname         String?          @db.VarChar(255)
+  emergencycontactrelationship String?          @db.VarChar(50)
+  emergencycontactphone        String?          @db.VarChar(20)
+  rentalcontract               rentalcontract[]
+}
+
+model unititem {
+  idunititem Int     @id @default(autoincrement())
+  idunituuid String? @db.Uuid
+  itemid     Int?
+  Unit       Unit?   @relation(fields: [idunituuid], references: [idunituuid], onDelete: Cascade, onUpdate: NoAction)
+  item       item?   @relation(fields: [itemid], references: [iditem], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model unittype {
+  idtype   Int    @id @default(autoincrement())
+  typename String @db.VarChar(100)
+}
+
+model visit {
+  idvisit          String    @id @db.Uuid
+  visit_date       DateTime? @db.Timestamp(6)
+  idunituuid       String?   @db.Uuid
+  status_visit     String?   @db.VarChar(50)
+  rejection_reason String?
+  Unit             Unit?     @relation(fields: [idunituuid], references: [idunituuid], onDelete: Cascade, onUpdate: NoAction)
 }
